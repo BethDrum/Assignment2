@@ -1,16 +1,14 @@
-//IGNORE
-
+#include "Member.cpp"
+#include "Book.cpp"
 
 #include <string>
 #include <iostream>
 #include <vector>
 using namespace std;
 
-
-//INHERITANCE FROM BOOK AND MEMBERS
 template <class T>
 class Library{
-    //linked list?
+    //vectors
     vector<Member> membList;
     vector<Book> libBookList;
 
