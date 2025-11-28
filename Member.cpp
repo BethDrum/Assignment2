@@ -27,13 +27,13 @@ class Member{
             name = newName;
         }
 
-        //to add a book to the members book list
+        //to add a book to the members book list ('Borrow')
         void addBook(int bID, string ti, string au, string gen, int pgC, bool ava){
             Book book(bID, ti, au, gen, pgC, ava);
             bookList.push_back(book);
         }
 
-        //remove book from book list
+        //remove book from book list ('Return')
         void removeBook(Book book){
             bookList.erase(book);
         }

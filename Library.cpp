@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 template <class T>
@@ -93,4 +94,46 @@ class Library{
             }
         }
     }
+
+    //read library info from file
+    void readFromFile(string fileName){
+        string line;
+        int i = 0;
+        vector<string> v;
+
+        //open file
+        ifstream reader(fileName);
+
+        if (!reader){
+            cout << "Error on opening file" << endl;
+            return;
+        }
+
+        while(getline(reader, lines)){
+            vector<string> single = split(lines);
+            
+            for (string s : single){
+                v.push_back(line);
+            }
+        }
+
+        reader.close();
+        
+        for(int i=0; i<v.size; i++){
+            cout << v[i] << endl;
+        }
+
+        return 0;
+    }
 };
+
+string split(string str){
+    vector<string> tokens;
+    string token;
+    stringstream ss(str);
+
+    while (ss >> token){
+        tokens.push_back(token);
+    }
+    return tokens;
+}
