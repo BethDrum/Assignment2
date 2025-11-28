@@ -1,4 +1,4 @@
-#include "Library.cpp"
+#include "Library.h"
 
 #include <string>
 #include <iostream>
@@ -6,6 +6,6 @@
 using namespace std;
 
 int main(){
-    Library lib;
-    Lib.readFromFile(books.txt);
+    Library Lib;
+    Lib.readFromFile("books.txt");
 }

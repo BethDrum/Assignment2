@@ -1,77 +1,68 @@
-#include "member.cpp"
+//#include "Member.h"
+#include "Book.h"
+
 #include <string>
 using namespace std;
 
-class Book{
-    private:
-        int bookID;
-        string title;
-        string author;
-        string genre;
-        int pgCount;
-        bool avai;
+//get & set for bookID
+int Book::getBookID(){
+    return bookID;
+}
 
-    public:
-        //get & set for bookID
-        int getBookID(){
-            return bookID;
-        }
+void Book::setBookID(int newBookID){
+    bookID = newBookID;
+}
+//get & set for title
+string Book::getTitle(){
+    return title;
+}
 
-        void setBookID(int newBookID){
-            bookID = newBookID;
-        }
-        //get & set for title
-        string getTitle(){
-            return title;
-        }
+void Book::setTitle(string newTitle){
+    title = newTitle;
+}
 
-        void setTitle(string newTitle){
-            title = newTitle;
-        }
+//get & set for author
+string Book::getAuthor(){
+    return author;
+}
 
-        //get & set for author
-        string getAuthor(){
-            return author;
-        }
+void Book::setAuthor(string newAuthor){
+    author = newAuthor;
+}
 
-        void setAuthor(string newAuthor){
-            author = newAuthor;
-        }
+//get & set for genre
+string Book::getGenre(){
+    return genre;
+}
 
-        //get & set for genre
-        string getGenre(){
-            return genre;
-        }
+void Book::setGenre(string newGenre){
+    genre = newGenre;
+}
 
-        void setGenre(string newGenre){
-            genre = newGenre;
-        }
+//get & set for page count
+int Book::getPgCount(){
+    return pgCount;
+}
 
-        //get & set for page count
-        int getPgCount(){
-            return pgCount;
-        }
+void Book::setPgCount(int newPgCount){
+    pgCount = newPgCount;
+}
 
-        void setPgCount(int newPgCount){
-            pgCount = newPgCount;
-        }
+//get & set for availiability
+bool Book::getAvai(){
+    return avai;
+}
 
-        //get & set for availiability
-        bool getAvai(){
-            return avai;
-        }
+void Book::setAvail(bool newAvai){
+    avai = newAvai;
+}
 
-        void setAvail(bool newAvai){
-            avai = newAvai;
-        }
-
-        //constructor
-        Book(int bID, string ti, string au, string gen, int pgC, bool ava){
-            bookID = bID;
-            title = ti;
-            author = au;
-            genre = gen;
-            pgCount = pgC;
-            avai = ava;
-        }
-};
+//constructor
+Book::Book(int bID, string ti, string au, string gen, int pgC, bool ava){
+    bookID = bID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = ava;
+}
