@@ -12,13 +12,13 @@ using namespace std;
 //template <class T>
 
 //to add a member
-void Library::addMembList(int membID, string nam, int bkList){
+void Library::addMembList(string membID, string nam){
     Member memb(membID, nam);
     membList.push_back(memb);
 }
 
 //remove members
-void Library::removeMembList(int membID){
+void Library::removeMembList(string membID){
     for (Member mem : membList){
         if (mem.getMembID() == membID){
             membList.pop_back();
@@ -26,28 +26,44 @@ void Library::removeMembList(int membID){
     }
 }
 
+//search for member
+bool Library::searchForMemb(string searchID){
+    for (Member mem : membList){
+        if(mem.getMembID() == searchID){
+            return true;
+        }else if(mem.getName() == searchID){
+            return true;
+        }
+    }
+    return false;
+}
+
 //to add a book to the library
-void Library::addLibBook(int bID, string ti, string au, string gen, int pgC, bool ava){
-    Book book(bID, ti, au, gen, pgC, ava);
+void Library::addLibBook(string bID, string ti, string au, string gen, int pgC){
+    Book book(bID, ti, au, gen, pgC);
     libBookList.push_back(book);
 }
 
 //remove book from library
-void Library::removeLibBook(int bookID){
+void Library::removeLibBook(string bookID){
+    int i = 0;
     for (Book bk : libBookList){
         if (bk.getBookID() == bookID){
-            libBookList.pop_back();
+            libBookList.erase(libBookList.begin() + i);
+            cout << "removed." << endl;
         }
+        i++;
     }
 }
 
+
 //search for book
-void Library::searchForBook(T searchID){
+void Library::searchForBook(string searchID){
     for (Book bk : libBookList){
         if(bk.getBookID() == searchID){
-            cout << "found";
+            cout << "found" << endl;
         }else if(bk.getTitle() == searchID){
-            cout << "found";
+            cout << "found" << endl;
         }
     }
 }
@@ -59,25 +75,32 @@ void Library::dispAllMemb(){
     }
 }
 
-//borrow book
-void Library::borrowBook(int bkID, int memID){
+//borrow book - NEED TO ADD TRY CATCHES OR SOMETHING FOR ERROR CHECKING
+void Library::borrowBook(string bkID, string memID){
     for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
             //set the book in the library to be unavailiable
             for (Book bk : libBookList){
                 if (bk.getBookID() == bkID){
+                    //check if the book is availiable
+                    if (bk.getAvai() == false){
+                        cout << "not availiable" << endl;
+                        return;
+                    }
+                    //set to false
                     bk.setAvail(false);
+                    //add the book to the member book list
+                    mem.addBook(bk.getBookID(), bk.getTitle(), bk.getAuthor(), bk.getGenre(), bk.getPgCount());
                 }
-                //add the book to the member book list
-                mem.addBook(bk);
             }
         }
     }
 }
 
 //return book
-void Library::returnBook(int bkID, int memID){
+void Library::returnBook(string bkID, string memID){
+    int i=0;
     for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
@@ -87,7 +110,8 @@ void Library::returnBook(int bkID, int memID){
                     bk.setAvail(true);
                 }
                 //remove the book from the member book list
-                mem.addBook(bk);
+                //mem.removeBook(i);
+                i++;
             }
         }
     }
@@ -107,7 +131,6 @@ vector<string> Library::split(string str){
 //read library info from file
 int Library::readFromFile(string fileName){
     string lines;
-    int i = 0;
     vector<string> v;
 
     //open file
@@ -115,7 +138,6 @@ int Library::readFromFile(string fileName){
 
     if (!reader){
         cout << "Error on opening file" << endl;
-        return;
     }
 
     while(getline(reader, lines)){
@@ -128,7 +150,7 @@ int Library::readFromFile(string fileName){
 
     reader.close();
     
-    for(int i=0; i<v.size(); i++){
+    for(size_t i=0; i<v.size(); i++){
         cout << v[i] << endl;
     }
 

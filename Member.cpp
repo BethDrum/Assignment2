@@ -5,11 +5,11 @@
 using namespace std;
 
 //get & sets for memberID and name
-int Member::getMembID(){
+string Member::getMembID(){
     return memberID;
 }
 
-void Member::setMembID(int newMemID){
+void Member::setMembID(string newMemID){
     memberID = newMemID;
 }
 
@@ -22,23 +22,26 @@ void Member::setName(string newName){
 }
 
 //to add a book to the members book list ('Borrow')
-void Member::addBookNew(int bID, string ti, string au, string gen, int pgC, bool ava){
-    Book book(bID, ti, au, gen, pgC, ava);
+void Member::addBook(string bID, string ti, string au, string gen, int pgC){
+    Book book(bID, ti, au, gen, pgC);
     bookList.push_back(book);
 }
 
+/**
 //to add a book to the members book list ('Borrow')
-void Member::addBook(Book bk){
+void Member::addBook(int bID, string ti, string au, string gen, int pgC, bool ava){
+    Book bk(bID, ti, au, gen, pgC, ava);
     bookList.push_back(bk);
-}
+}*/
 
+/**
 //remove book from book list ('Return')
-void Member::removeBook(Book book){
-    //bookList.erase(book);
-}
+void Member::removeBook(int place){
+    //bookList.erase(place);
+}*/
 
 //constructor
-Member::Member(int membID, string nam){
+Member::Member(string membID, string nam){
     memberID = membID;
     name = nam;
     bookList.clear();

@@ -8,19 +8,19 @@ using namespace std;
 
 class Member{
     private: 
-        int memberID;
+        string memberID;
         string name;
         vector<Book> bookList;
 
     public:
-        int getMembID();
-        void setMembID(int newMemID);
+        string getMembID();
+        void setMembID(string newMemID);
         string getName();
         void setName(string newName);
-        void addBookNew(int bID, string ti, string au, string gen, int pgC, bool ava);
-        void addBook(Book bk);
-        void removeBook(Book book);
-        Member(int membID, string nam);
+        void addBook(string bID, string ti, string au, string gen, int pgC);
+        //void addBook(Book bk);
+        //void removeBook(int place);
+        Member(string membID, string nam);
 };
 
 #endif

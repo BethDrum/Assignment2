@@ -7,7 +7,7 @@ using namespace std;
 
 class Book{
     private:
-        int bookID;
+        string bookID;
         string title;
         string author;
         string genre;
@@ -15,8 +15,8 @@ class Book{
         bool avai;
 
     public:
-        int getBookID();
-        void setBookID(int newBookID);
+        string getBookID();
+        void setBookID(string newBookID);
         string getTitle();
         void setTitle(string newTitle);
         string getAuthor();
@@ -27,7 +27,8 @@ class Book{
         void setPgCount(int newPgCount);
         bool getAvai();
         void setAvail(bool newAvai);
-        Book(int bID, string ti, string au, string gen, int pgC, bool ava);
+        Book(string bID, string ti, string au, string gen, int pgC);
+        Book(string bID, string ti, string au, string gen, int pgC, bool ava);
 };
 
 #endif

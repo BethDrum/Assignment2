@@ -5,11 +5,11 @@
 using namespace std;
 
 //get & set for bookID
-int Book::getBookID(){
+string Book::getBookID(){
     return bookID;
 }
 
-void Book::setBookID(int newBookID){
+void Book::setBookID(string newBookID){
     bookID = newBookID;
 }
 //get & set for title
@@ -58,7 +58,16 @@ void Book::setAvail(bool newAvai){
 }
 
 //constructor
-Book::Book(int bID, string ti, string au, string gen, int pgC, bool ava){
+Book::Book(string bID, string ti, string au, string gen, int pgC){
+    bookID = bID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = true;
+}
+
+Book::Book(string bID, string ti, string au, string gen, int pgC, bool ava){
     bookID = bID;
     title = ti;
     author = au;

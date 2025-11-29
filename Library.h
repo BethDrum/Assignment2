@@ -10,7 +10,6 @@
 #include <vector>
 #include <sstream>
 using namespace std;
-template <class T>
 
 class Library{
     private:
@@ -18,15 +17,16 @@ class Library{
         vector<Book> libBookList;
 
     public:
-        void addMembList(int membID, string nam, int bkList);
-        void removeMembList(int membID);
-        void addLibBook(int bID, string ti, string au, string gen, int pgC, bool ava);
-        void removeLibBook(int bookID);
-        void searchForBook(T searchID);
+        void addMembList(string membID, string nam);
+        void removeMembList(string membID);
+        bool searchForMemb(string searchID);
+        void addLibBook(string bID, string ti, string au, string gen, int pgC);
+        void removeLibBook(string bookID);
         void dispAllMemb();
-        void borrowBook(int bkID, int memID);
-        void returnBook(int bkID, int memID);
+        void borrowBook(string bkID, string memID);
+        void returnBook(string bkID, string memID);
         vector<string> split(string str);
         int readFromFile(string fileName);
+        void searchForBook(string searchID);
 };
 #endif
