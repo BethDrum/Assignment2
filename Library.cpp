@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <ctime>
 using namespace std;
 
 //template <class T>
@@ -19,10 +20,13 @@ void Library::addMembList(string membID, string nam){
 
 //remove members
 void Library::removeMembList(string membID){
+    int i = 0;
     for (Member mem : membList){
         if (mem.getMembID() == membID){
-            membList.pop_back();
+            membList.erase(membList.begin() + i);
+            cout << "removed." << endl;
         }
+        i++;
     }
 }
 
@@ -68,10 +72,17 @@ void Library::searchForBook(string searchID){
     }
 }
 
+//display all books
+void Library::dispAllBook(){
+    for (Book bk : libBookList){
+        cout << bk.getBookID() << " " << bk.getTitle() << " " << bk.getAuthor() << " " << bk.getGenre() << " " << bk.getPgCount() << " " << bk.getAvai() << "\n";
+    }
+}
+
 //display all registerd members
 void Library::dispAllMemb(){
     for (Member mem : membList){
-        cout << mem.getName() << mem.getMembID() << "\n";
+        cout << mem.getName() << " " << mem.getMembID() << "\n";
     }
 }
 
@@ -84,12 +95,12 @@ void Library::borrowBook(string bkID, string memID){
             for (Book bk : libBookList){
                 if (bk.getBookID() == bkID){
                     //check if the book is availiable
-                    if (bk.getAvai() == false){
+                    if (bk.getAvai() == 0){
                         cout << "not availiable" << endl;
                         return;
                     }
                     //set to false
-                    bk.setAvail(false);
+                    bk.setAvail(0);
                     //add the book to the member book list
                     mem.addBook(bk.getBookID(), bk.getTitle(), bk.getAuthor(), bk.getGenre(), bk.getPgCount());
                 }
@@ -107,7 +118,7 @@ void Library::returnBook(string bkID, string memID){
             //set the book in the library to be availiable if book exists
             for (Book bk : libBookList){
                 if (bk.getBookID() == bkID){
-                    bk.setAvail(true);
+                    bk.setAvail(1);
                 }
                 //remove the book from the member book list
                 //mem.removeBook(i);
@@ -123,6 +134,13 @@ vector<string> Library::split(string str){
     stringstream ss(str);
 
     while (ss >> token){
+        //check if there is a quote (for the book title, author etc to not be seperated)
+        if (ss.peek() == '"'){
+            ss.get();
+            getline(ss, token, '"');
+        }else{
+            ss >> token;
+        }
         tokens.push_back(token);
     }
     return tokens;
@@ -155,4 +173,76 @@ int Library::readFromFile(string fileName){
     }
 
     return 0;
+}
+
+
+//save library info to file - NEED TO ADD ALL BOOKS FOR THE MEMBER
+bool Library::saveToFile(){
+    //string fileN = filename+".txt";
+    //cout << fileN << endl;
+
+    ofstream writer("books.txt");
+
+    if (!writer){
+        cerr << "Error opening file for output" << endl;
+        return false;
+    }
+
+    for (Book bk : libBookList){
+        writer << bk.getBookID() << '"' << bk.getTitle() << '"' << '"' << bk.getAuthor() << '"' << '"' << bk.getGenre() << '"' << bk.getPgCount() << bk.getAvai() << endl;
+    }
+    writer.close();
+
+    ofstream writer2("members.txt");
+    if (!writer2){
+        cerr << "Error opening file for output" << endl;
+        return false;
+    }
+
+    for (Member mem : membList){
+        writer2 << mem.getMembID() << mem.getName() << endl;
+    }
+    writer2.close();
+
+    return true;
+}
+
+//JUST NEEDS MATH - should track due date then calc penalties - can be different for type
+void Library::checkReturn(int outYr, int outMon, int outDay){
+    //get day
+    time_t currentDate = time(0);
+    tm *currDate = localtime(&currentDate);
+
+    cout << "Year: " << 1900+currDate->tm_year << endl;
+    cout << "Month" << 1+currDate->tm_mon << endl;
+    cout << "Day:" << currDate->tm_mday << endl;
+
+    int yr = 1900+currDate->tm_year;
+    int mon = 1+currDate->tm_mon;
+    int day = currDate->tm_mday;
+
+    //calculate penalty
+    //all have a month to return, 10 days late is £10, 20 days late is £20 and above a month late is £40
+    //if (){
+
+    //}
+
+    //check if past current day
+}
+
+//multi criteria search - title, author, genre, availiability NEEDS TEMPLATE SO CAN DO AVAILIABILITY
+void Library::multiSearch(string data){
+    int choice;
+    //cout << "Please choose what you are searching for: \n1. Title, \n2. Author, \n3. Genre, \n4. Availability \n(0 to exit)" << endl;
+    //cin >> choice;
+    //switch(choice){
+    for (Book bk : libBookList){
+        if(bk.getTitle() == data){
+            cout << "found title" << endl;
+        }else if(bk.getAuthor() == data){
+            cout << "found author" << endl;
+        }else if(bk.getGenre() == data){
+            cout << "found author" << endl;
+        }//ADD FOR AVAILABILITY
+    }
 }

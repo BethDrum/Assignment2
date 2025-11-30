@@ -40,7 +40,7 @@ int main(){
             case 1:
                 cout << "You have selected Admin options.\n--------------\n";
                 while (doneAdm == false){
-                    cout << "Enter a number to make you selection, your choices are: \n1. Add a book to the library. \n2. Remove a book from the Library. \n3. Search for a book by title or ID \n4. View all registered members \n5. Add a member \n6. Remove a member \n";
+                    cout << "Enter a number to make you selection, your choices are: \n1. Add a book to the library. \n2. Remove a book from the Library. \n3. Search for a book by title or ID \n4. Diplay all registered books \n5. View all registered members \n6. Add a member \n7. Remove a member \n8. Load in previous Library \n9. Save current library to file" << endl;
                     cin >> choice2;
                     //enter switch for admin options
                     switch(choice2){
@@ -80,10 +80,13 @@ int main(){
                         Lib.searchForBook(bID);
                         break;
                     case 4:
+                        cout << "Display all Books selected.\n--------------\n" << endl;
+                        Lib.dispAllBook();
+                    case 5:
                         cout << "View all registered members selected.\n--------------\n";
                         Lib.dispAllMemb();
                         break;
-                    case 5:
+                    case 6:
                         cout << "Add new member selected.\n--------------\n";
                         cout << "Please enter the member name: " << endl;
                         cin >> name;
@@ -94,17 +97,19 @@ int main(){
 
                         Lib.addMembList(mID, name);//ID and name
                         break;
-                    case 6:
+                    case 7:
                         cout << "Remove member selected.\n--------------\n";
                         cout << "Enter the ID of the member you wish to delete: " << endl;
                         cin >> mID;
                         Lib.removeMembList(mID);
                         break;
-                    case 7:
+                    case 8:
                         cout << "Load in previous saved library selected.\n--------------\n";
                         break;
-                    case 8:
+                    case 9:
                         cout << "Save current library selected.\n--------------\n";
+                        Lib.saveToFile();
+                        break;
                     }
                 }   
                 break;
@@ -146,7 +151,7 @@ int main(){
             case 0:
                 cout << "Exiting...\n--------------\n";
                 doneAll == true;
-                break;
+                return 0;
         }
     }
     return 0;

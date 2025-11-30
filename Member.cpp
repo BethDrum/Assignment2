@@ -1,6 +1,7 @@
 #include "Book.h"
 #include "Member.h"
 #include <string>
+#include <iostream>
 #include <vector>
 using namespace std;
 
@@ -45,5 +46,12 @@ Member::Member(string membID, string nam){
     memberID = membID;
     name = nam;
     bookList.clear();
+}
+
+//print all books - WHY NOT WORKING
+void Member::allBooks(){
+    for (Book bk : bookList){
+        cout << bk.getBookID();
+    }
 }
 

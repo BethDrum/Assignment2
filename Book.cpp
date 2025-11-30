@@ -49,11 +49,11 @@ void Book::setPgCount(int newPgCount){
 }
 
 //get & set for availiability
-bool Book::getAvai(){
+int Book::getAvai(){
     return avai;
 }
 
-void Book::setAvail(bool newAvai){
+void Book::setAvail(int newAvai){
     avai = newAvai;
 }
 
@@ -64,10 +64,10 @@ Book::Book(string bID, string ti, string au, string gen, int pgC){
     author = au;
     genre = gen;
     pgCount = pgC;
-    avai = true;
+    avai = 1;
 }
 
-Book::Book(string bID, string ti, string au, string gen, int pgC, bool ava){
+Book::Book(string bID, string ti, string au, string gen, int pgC, int ava){
     bookID = bID;
     title = ti;
     author = au;

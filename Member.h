@@ -4,6 +4,7 @@
 #include "Book.h"
 #include <string>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 class Member{
@@ -21,6 +22,7 @@ class Member{
         //void addBook(Book bk);
         //void removeBook(int place);
         Member(string membID, string nam);
+        void allBooks();
 };
 
 #endif

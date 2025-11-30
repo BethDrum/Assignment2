@@ -12,7 +12,7 @@ class Book{
         string author;
         string genre;
         int pgCount;
-        bool avai;
+        int avai;
 
     public:
         string getBookID();
@@ -25,10 +25,10 @@ class Book{
         void setGenre(string newGenre);
         int getPgCount();
         void setPgCount(int newPgCount);
-        bool getAvai();
-        void setAvail(bool newAvai);
+        int getAvai();
+        void setAvail(int newAvai);
         Book(string bID, string ti, string au, string gen, int pgC);
-        Book(string bID, string ti, string au, string gen, int pgC, bool ava);
+        Book(string bID, string ti, string au, string gen, int pgC, int ava);
 };
 
 #endif
