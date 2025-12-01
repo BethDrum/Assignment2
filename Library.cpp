@@ -1,5 +1,5 @@
 #include "Member.h"
-#include "Book.h"
+#include "Publication.h"
 #include "Library.h"
 
 #include <string>
@@ -8,34 +8,50 @@
 #include <sstream>
 #include <fstream>
 #include <ctime>
+#include <stdexcept>
 using namespace std;
 
 //template <class T>
 
 //to add a member
-void Library::addMembList(string membID, string nam){
+bool Library::addMembList(string membID, string nam){
     Member memb(membID, nam);
-    membList.push_back(memb);
+    try{
+        membList.push_back(memb);
+    }catch (exception e){
+        cout << "Error adding to vector" << endl;
+        return false;
+    }
+    return true;
 }
 
 //remove members
-void Library::removeMembList(string membID){
+bool Library::removeMembList(string membID){
     int i = 0;
     for (Member mem : membList){
         if (mem.getMembID() == membID){
-            membList.erase(membList.begin() + i);
-            cout << "removed." << endl;
+            try{
+                membList.erase(membList.begin() + i);
+            }catch (exception e){
+                cout << "Error removing from vector" << endl;
+                return false;
+            }
+            return true;
         }
         i++;
     }
+    cout << "Member does not exist" << endl;
+    return false;
 }
 
 //search for member
 bool Library::searchForMemb(string searchID){
     for (Member mem : membList){
         if(mem.getMembID() == searchID){
+            mem.viewMemb();
             return true;
         }else if(mem.getName() == searchID){
+            mem.viewMemb();
             return true;
         }
     }
@@ -43,18 +59,53 @@ bool Library::searchForMemb(string searchID){
 }
 
 //to add a book to the library
-void Library::addLibBook(string bID, string ti, string au, string gen, int pgC){
-    Book book(bID, ti, au, gen, pgC);
-    libBookList.push_back(book);
+bool Library::addLibBook(string pID, string ti, string au, string gen, int pgC){
+    Book book(pID, ti, au, gen, pgC);
+    try{
+        readingList.push_back(book);
+    } catch (exception e){
+        cout << "Error adding book" << endl;
+        return false;
+    }
+    return true;
+}
+
+//add journal to the library
+bool Library::addLibJour(string pID, string ti, string au, string gen, int pgC, int vol){
+    Journal jour(pID, ti, au, gen, pgC, vol);
+    try{
+        readingList.push_back(jour);
+    } catch (exception e){
+        cout << "Error adding journal" << endl;
+        return false;
+    }
+    return true;
+}
+
+//add magazine to the library
+bool Library::addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN){
+    Magazine mag(pID, ti, au, gen, pgC, issueN);
+    try{
+        readingList.push_back(mag);
+    } catch (exception e){
+        cout << "Error adding journal" << endl;
+        return false;
+    }
+    return true;
 }
 
 //remove book from library
-void Library::removeLibBook(string bookID){
+bool Library::removeLibPub(string readingID){
     int i = 0;
-    for (Book bk : libBookList){
-        if (bk.getBookID() == bookID){
-            libBookList.erase(libBookList.begin() + i);
-            cout << "removed." << endl;
+    for (Publication pub : readingList){
+        if (pub.getPubID() == readingID){
+            try{
+                readingList.erase(readingList.begin() + i);
+            } catch (exception e){
+                cout << "Remove from reading list failed" << endl;
+                return false;
+            }
+            return true;
         }
         i++;
     }
@@ -63,19 +114,25 @@ void Library::removeLibBook(string bookID){
 
 //search for book
 void Library::searchForBook(string searchID){
-    for (Book bk : libBookList){
-        if(bk.getBookID() == searchID){
+    for (Publication pb : readingList){
+        if(pb.getPubID() == searchID){
             cout << "found" << endl;
-        }else if(bk.getTitle() == searchID){
+        }else if(pb.getTitle() == searchID){
             cout << "found" << endl;
         }
     }
 }
 
 //display all books
-void Library::dispAllBook(){
-    for (Book bk : libBookList){
-        cout << bk.getBookID() << " " << bk.getTitle() << " " << bk.getAuthor() << " " << bk.getGenre() << " " << bk.getPgCount() << " " << bk.getAvai() << "\n";
+void Library::dispAllPub(){
+    for (Publication pb : readingList){
+        if (pb.getType()=="BOOK"){
+            Book bk(pb.getPubID(), pb.getTitle(), pb.getAuthor(), pb.getGenre(), pb.getPgCount());
+            bk.viewBook();
+        }else if(pb.getType()=="MAG"){
+            Magazine mg(pb.getPubID(), pb.getTitle(), pb.getAuthor(), pb.getGenre(), pb.getPgCount(), pb.getIssueN());
+            mg.viewMag();
+        }
     }
 }
 
@@ -86,46 +143,60 @@ void Library::dispAllMemb(){
     }
 }
 
-//borrow book - NEED TO ADD TRY CATCHES OR SOMETHING FOR ERROR CHECKING
-void Library::borrowBook(string bkID, string memID){
+//borrow book
+bool Library::borrowPub(string pbID, string memID){
     for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
             //set the book in the library to be unavailiable
-            for (Book bk : libBookList){
-                if (bk.getBookID() == bkID){
+            for (Publication pb : readingList){
+                if (pb.getPubID() == pbID){
                     //check if the book is availiable
-                    if (bk.getAvai() == 0){
-                        cout << "not availiable" << endl;
-                        return;
+                    if (pb.getAvai() == 0){
+                        cout << "Publication not availiable" << endl;
+                        return false;
                     }
                     //set to false
-                    bk.setAvail(0);
-                    //add the book to the member book list
-                    mem.addBook(bk.getBookID(), bk.getTitle(), bk.getAuthor(), bk.getGenre(), bk.getPgCount());
+                    pb.setAvail(0);
+                    //add the publication type to the member book list
+                    if (!mem.addPub(pb.getPubID())){
+                        cout << "Error when adding publication to member class." << endl;
+                        return false;
+                    }else{
+                        return true;
+                    }
                 }
             }
         }
     }
+    return false;
 }
 
 //return book
-void Library::returnBook(string bkID, string memID){
+bool Library::returnPub(string pbID, string memID){
     int i=0;
     for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
-            //set the book in the library to be availiable if book exists
-            for (Book bk : libBookList){
-                if (bk.getBookID() == bkID){
-                    bk.setAvail(1);
+            //remove the book from the member book list
+            if (!(mem.removePub(pbID))){
+                cout << "Error removing from the member book list." << endl;
+                return false;
+            }else{
+                //the publication has been succesfully removed
+                //if the ID is the same as that returning, make availiable again
+                for (Publication pb : readingList){
+                    if (pb.getPubID() == pbID){
+                        pb.setAvail(1);
+                    }
                 }
-                //remove the book from the member book list
-                //mem.removeBook(i);
-                i++;
+                return true;
             }
+            i++;
         }
     }
+    cout << "Memeber not found" << endl;
+    return false;
 }
 
 vector<string> Library::split(string str){
@@ -181,28 +252,28 @@ bool Library::saveToFile(){
     //string fileN = filename+".txt";
     //cout << fileN << endl;
 
-    ofstream writer("books.txt");
+    ofstream writerP("books.txt");
 
-    if (!writer){
+    if (!writerP){
         cerr << "Error opening file for output" << endl;
         return false;
     }
 
-    for (Book bk : libBookList){
-        writer << bk.getBookID() << '"' << bk.getTitle() << '"' << '"' << bk.getAuthor() << '"' << '"' << bk.getGenre() << '"' << bk.getPgCount() << bk.getAvai() << endl;
+    for (Publication pb : readingList){
+        writerP << pb.getPubID() << '"' << pb.getTitle() << '"' << '"' << pb.getAuthor() << '"' << '"' << pb.getGenre() << '"' << pb.getPgCount() << pb.getAvai() << endl;
     }
-    writer.close();
+    writerP.close();
 
-    ofstream writer2("members.txt");
-    if (!writer2){
+    ofstream writerM("members.txt");
+    if (!writerM){
         cerr << "Error opening file for output" << endl;
         return false;
     }
 
     for (Member mem : membList){
-        writer2 << mem.getMembID() << mem.getName() << endl;
+        writerM << mem.getMembID() << mem.getName() << endl;
     }
-    writer2.close();
+    writerM.close();
 
     return true;
 }
@@ -230,19 +301,52 @@ void Library::checkReturn(int outYr, int outMon, int outDay){
     //check if past current day
 }
 
-//multi criteria search - title, author, genre, availiability NEEDS TEMPLATE SO CAN DO AVAILIABILITY
+//multi criteria search - title, author, genre, availiability NEEDS TEMPLATE SO CAN DO AVAILIABILITY - ALSO LIKE... IS THIS A FILTER THING???
 void Library::multiSearch(string data){
     int choice;
     //cout << "Please choose what you are searching for: \n1. Title, \n2. Author, \n3. Genre, \n4. Availability \n(0 to exit)" << endl;
     //cin >> choice;
     //switch(choice){
-    for (Book bk : libBookList){
-        if(bk.getTitle() == data){
+    for (Publication pb : readingList){
+        if(pb.getTitle() == data){
             cout << "found title" << endl;
-        }else if(bk.getAuthor() == data){
+        }else if(pb.getAuthor() == data){
             cout << "found author" << endl;
-        }else if(bk.getGenre() == data){
+        }else if(pb.getGenre() == data){
             cout << "found author" << endl;
         }//ADD FOR AVAILABILITY
     }
+}
+
+//levenshtein function for fuzzy search - compare simelarity of searched to all names in the list and highest simelarity is shown to user
+int LevenshteinFunc(string str1, string str2, int m, int n){
+    //ensure books are not empty
+    if (m == 0){
+        return n;
+    }
+    if (n == 0){
+        return m;
+    }
+
+    if (str1[m-1] == str2[n-1]){
+        return LevenshteinFunc(str1, str2, m-1, n-1);
+    }
+    return 1
+        +min(
+            //insert
+            LevenshteinFunc(str1, str2, m, n-1), 
+            min(
+                //remove
+                LevenshteinFunc(str1, str2, m-1, n),
+                //replace
+                LevenshteinFunc(str1, str2, m-1, n-1)));
+}
+
+void fuzzySearch(){
+    //do repetitivly through the entire list with str2 changing to be the next in the list, keeping track of ID and distance away for each - smallest distance is best match and should be used
+    string str1 = "cat";
+    string str2 = "mat";
+
+    int dist = LevenshteinFunc(str1, str2, str1.length(), str2.length());
+    cout << "Distance: " << dist << endl;
 }

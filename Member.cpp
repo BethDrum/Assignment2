@@ -1,4 +1,4 @@
-#include "Book.h"
+#include "Publication.h"
 #include "Member.h"
 #include <string>
 #include <iostream>
@@ -23,9 +23,13 @@ void Member::setName(string newName){
 }
 
 //to add a book to the members book list ('Borrow')
-void Member::addBook(string bID, string ti, string au, string gen, int pgC){
-    Book book(bID, ti, au, gen, pgC);
-    bookList.push_back(book);
+bool Member::addPub(string pbID){
+    try{
+        bookList.push_back(pbID);
+    }catch (exception e){
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -35,11 +39,23 @@ void Member::addBook(int bID, string ti, string au, string gen, int pgC, bool av
     bookList.push_back(bk);
 }*/
 
-/**
+
 //remove book from book list ('Return')
-void Member::removeBook(int place){
-    //bookList.erase(place);
-}*/
+bool Member::removePub(string pubID){
+    int i = 0;
+    for (string pub : bookList){
+        if (pub == pubID){
+            try{
+                bookList.erase(bookList.begin() + i);
+            } catch (exception e){
+                //removal failed
+                return false;
+            }
+            return true;
+        }
+        i++;
+    }
+}
 
 //constructor
 Member::Member(string membID, string nam){
@@ -49,9 +65,14 @@ Member::Member(string membID, string nam){
 }
 
 //print all books - WHY NOT WORKING
+/** 
 void Member::allBooks(){
-    for (Book bk : bookList){
-        cout << bk.getBookID();
+    for (Publication pb : pubList){
+        cout << pb.getPubID();
     }
+}*/
+
+void Member::viewMemb(){
+    cout << "ID: " << getMembID() << " Name: " << getName();
 }
 

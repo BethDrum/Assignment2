@@ -2,30 +2,38 @@
 #define LIBRARY
 
 #include "Member.h"
-#include "Book.h"
+#include "Publication.h"
 #include "Library.h"
 
 #include <string>
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <fstream>
+#include <ctime>
 using namespace std;
 
 class Library{
     private:
         vector<Member> membList;
-        vector<Book> libBookList;
+        vector<Publication> readingList;
 
     public:
-        void addMembList(string membID, string nam);
-        void removeMembList(string membID);
+        bool addMembList(string membID, string nam);
+        bool removeMembList(string membID);
         bool searchForMemb(string searchID);
-        void addLibBook(string bID, string ti, string au, string gen, int pgC);
-        void removeLibBook(string bookID);
-        void dispAllBook();
+
+        bool addLibBook(string pID, string ti, string au, string gen, int pgC);
+        bool addLibJour(string pID, string ti, string au, string gen, int pgC, int vol);
+        bool addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
+        bool removeLibPub(string pubID);
+
+        void dispAllPub(); //ERROR
         void dispAllMemb();
-        void borrowBook(string bkID, string memID);
-        void returnBook(string bkID, string memID);
+
+        bool borrowPub(string pbID, string memID);
+        bool returnPub(string pbID, string memID);
+
         vector<string> split(string str);
         int readFromFile(string fileName);
         void searchForBook(string searchID);

@@ -1,7 +1,7 @@
 #ifndef MEMBER
 #define MEMBER
 
-#include "Book.h"
+#include "Publication.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -11,18 +11,19 @@ class Member{
     private: 
         string memberID;
         string name;
-        vector<Book> bookList;
+        vector<string> bookList;
 
     public:
         string getMembID();
         void setMembID(string newMemID);
         string getName();
         void setName(string newName);
-        void addBook(string bID, string ti, string au, string gen, int pgC);
+        bool addPub(string pbID);
         //void addBook(Book bk);
-        //void removeBook(int place);
+        bool removePub(string pbID);
         Member(string membID, string nam);
-        void allBooks();
+        //void allBooks();
+        void viewMemb();
 };
 
 #endif
