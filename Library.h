@@ -16,7 +16,7 @@ using namespace std;
 class Library{
     private:
         vector<Member> membList;
-        vector<Publication> readingList;
+        vector<Publication*> readingList;
 
     public:
         bool addMembList(string membID, string nam);
@@ -33,6 +33,7 @@ class Library{
 
         bool borrowPub(string pbID, string memID);
         bool returnPub(string pbID, string memID);
+        void viewBorrowed(string mID);
 
         vector<string> split(string str);
         int readFromFile(string fileName);

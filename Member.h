@@ -22,7 +22,7 @@ class Member{
         //void addBook(Book bk);
         bool removePub(string pbID);
         Member(string membID, string nam);
-        //void allBooks();
+        void viewBooks();
         void viewMemb();
 };
 

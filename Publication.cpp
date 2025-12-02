@@ -1,4 +1,3 @@
-//#include "Member.h"
 #include "Publication.h"
 
 #include <string>
@@ -63,6 +62,11 @@ string Publication::getType(){
     return type;
 }
 
+//view info
+void Publication::viewInfo(){
+    cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Availiability: " << avai << endl;
+}
+
 //BOOK
 //constructor for books
 Book::Book(string pID, string ti, string au, string gen, int pgC){
@@ -86,7 +90,7 @@ Book::Book(string pID, string ti, string au, string gen, int pgC, int ava){
 }
 
 //view info
-void Book::viewBook(){
+void Book::viewInfo() {
     cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Availiability: " << avai << endl;
 }
 
@@ -113,7 +117,7 @@ Magazine::Magazine(string pID, string ti, string au, string gen, int pgC, int is
 }
 
 //view info
-void Magazine::viewMag(){
+void Magazine::viewInfo() {
     cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Issue Number: " << issueNum << " Availiability: " << avai << endl;
 }
 
@@ -139,6 +143,6 @@ Journal::Journal(string pID, string ti, string au, string gen, int pgC, int vol)
 }
 
 //view info
-void Journal::viewJou(){
+void Journal::viewInfo(){
     cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Volume: " << volume << " Availiability: " << avai << endl;
 }

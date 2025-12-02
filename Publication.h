@@ -1,8 +1,8 @@
 #ifndef BOOK
 #define BOOK
 
-//#include "Member.h"
 #include <string>
+#include <iostream>
 using namespace std;
 
 class Publication{
@@ -29,6 +29,7 @@ class Publication{
         int getAvai();
         void setAvail(int newAvai);
         string getType();
+        virtual void viewInfo();
 };
 
 
@@ -36,7 +37,7 @@ class Book : public Publication{
     public:
         Book(string bID, string ti, string au, string gen, int pgC);
         Book(string bID, string ti, string au, string gen, int pgC, int ava);
-        void viewBook();
+        void viewInfo();
 };
 
 class Magazine : public Publication{
@@ -46,7 +47,7 @@ class Magazine : public Publication{
         int getIssueN();
         void setIssueN(int newIssueN);
         Magazine(string pID, string ti, string au, string gen, int pgC, int issueN);
-        void viewMag();
+        void viewInfo();
 };
 
 class Journal : public Publication{
@@ -56,7 +57,7 @@ class Journal : public Publication{
         int getVol();
         void setVol(int newVol);
         Journal(string pID, string ti, string au, string gen, int pgC, int vol);
-        void viewJou();
+        void viewInfo();
 };
 
 #endif

@@ -62,7 +62,7 @@ bool Library::searchForMemb(string searchID){
 bool Library::addLibBook(string pID, string ti, string au, string gen, int pgC){
     Book book(pID, ti, au, gen, pgC);
     try{
-        readingList.push_back(book);
+        readingList.push_back(new Book(book));
     } catch (exception e){
         cout << "Error adding book" << endl;
         return false;
@@ -74,7 +74,7 @@ bool Library::addLibBook(string pID, string ti, string au, string gen, int pgC){
 bool Library::addLibJour(string pID, string ti, string au, string gen, int pgC, int vol){
     Journal jour(pID, ti, au, gen, pgC, vol);
     try{
-        readingList.push_back(jour);
+        readingList.push_back(new Journal(jour));
     } catch (exception e){
         cout << "Error adding journal" << endl;
         return false;
@@ -86,7 +86,7 @@ bool Library::addLibJour(string pID, string ti, string au, string gen, int pgC, 
 bool Library::addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN){
     Magazine mag(pID, ti, au, gen, pgC, issueN);
     try{
-        readingList.push_back(mag);
+        readingList.push_back(new Magazine(mag));
     } catch (exception e){
         cout << "Error adding journal" << endl;
         return false;
@@ -97,8 +97,8 @@ bool Library::addLibMag(string pID, string ti, string au, string gen, int pgC, i
 //remove book from library
 bool Library::removeLibPub(string readingID){
     int i = 0;
-    for (Publication pub : readingList){
-        if (pub.getPubID() == readingID){
+    for (Publication* pub : readingList){
+        if (pub->getPubID() == readingID){
             try{
                 readingList.erase(readingList.begin() + i);
             } catch (exception e){
@@ -114,10 +114,10 @@ bool Library::removeLibPub(string readingID){
 
 //search for book
 void Library::searchForBook(string searchID){
-    for (Publication pb : readingList){
-        if(pb.getPubID() == searchID){
+    for (Publication* pb : readingList){
+        if(pb->getPubID() == searchID){
             cout << "found" << endl;
-        }else if(pb.getTitle() == searchID){
+        }else if(pb->getTitle() == searchID){
             cout << "found" << endl;
         }
     }
@@ -125,13 +125,16 @@ void Library::searchForBook(string searchID){
 
 //display all books
 void Library::dispAllPub(){
-    for (Publication pb : readingList){
-        if (pb.getType()=="BOOK"){
-            Book bk(pb.getPubID(), pb.getTitle(), pb.getAuthor(), pb.getGenre(), pb.getPgCount());
-            bk.viewBook();
-        }else if(pb.getType()=="MAG"){
-            Magazine mg(pb.getPubID(), pb.getTitle(), pb.getAuthor(), pb.getGenre(), pb.getPgCount(), pb.getIssueN());
-            mg.viewMag();
+    for (Publication* pb : readingList){
+        if (pb->getType()=="BOOK"){
+            Book* bk = static_cast<Book*>(pb);
+            bk->viewInfo();
+        }else if(pb->getType()=="MAG"){
+            Magazine* mg = static_cast<Magazine*>(pb);
+            mg->viewInfo();
+        }else if(pb->getType()=="JOUR"){
+            Journal* jou = static_cast<Journal*>(pb);
+            jou->viewInfo();
         }
     }
 }
@@ -149,17 +152,17 @@ bool Library::borrowPub(string pbID, string memID){
         //if the member exists
         if (mem.getMembID() == memID){
             //set the book in the library to be unavailiable
-            for (Publication pb : readingList){
-                if (pb.getPubID() == pbID){
+            for (Publication* pb : readingList){
+                if (pb->getPubID() == pbID){
                     //check if the book is availiable
-                    if (pb.getAvai() == 0){
+                    if (pb->getAvai() == 0){
                         cout << "Publication not availiable" << endl;
                         return false;
                     }
                     //set to false
-                    pb.setAvail(0);
+                    pb->setAvail(0);
                     //add the publication type to the member book list
-                    if (!mem.addPub(pb.getPubID())){
+                    if (!mem.addPub(pb->getPubID())){
                         cout << "Error when adding publication to member class." << endl;
                         return false;
                     }else{
@@ -185,9 +188,9 @@ bool Library::returnPub(string pbID, string memID){
             }else{
                 //the publication has been succesfully removed
                 //if the ID is the same as that returning, make availiable again
-                for (Publication pb : readingList){
-                    if (pb.getPubID() == pbID){
-                        pb.setAvail(1);
+                for (Publication* pb : readingList){
+                    if (pb->getPubID() == pbID){
+                        pb->setAvail(1);
                     }
                 }
                 return true;
@@ -197,6 +200,15 @@ bool Library::returnPub(string pbID, string memID){
     }
     cout << "Memeber not found" << endl;
     return false;
+}
+
+void Library::viewBorrowed(string mID){
+    for (Member mem : membList){
+        //if the member exists
+        if (mem.getMembID() == mID){
+            mem.viewBooks();
+        }
+    }
 }
 
 vector<string> Library::split(string str){
@@ -259,8 +271,17 @@ bool Library::saveToFile(){
         return false;
     }
 
-    for (Publication pb : readingList){
-        writerP << pb.getPubID() << '"' << pb.getTitle() << '"' << '"' << pb.getAuthor() << '"' << '"' << pb.getGenre() << '"' << pb.getPgCount() << pb.getAvai() << endl;
+    for (Publication* pb : readingList){
+        if (pb->getType()=="BOOK"){
+            Book* bk = static_cast<Book*>(pb);
+            writerP << pb->getPubID() << '"' << pb->getTitle() << '"' << '"' << pb->getAuthor() << '"' << '"' << pb->getGenre() << '"' << pb->getPgCount() << pb->getAvai() << endl;
+        }else if(pb->getType()=="MAG"){
+            Magazine* mg = static_cast<Magazine*>(pb);
+            writerP << mg->getPubID() << '"' << mg->getTitle() << '"' << '"' << mg->getAuthor() << '"' << '"' << mg->getGenre() << '"' << mg->getPgCount() << mg->getAvai() << mg->getIssueN() << endl;
+        }else if(pb->getType()=="JOUR"){
+            Journal* jou = static_cast<Journal*>(pb);
+            writerP << jou->getPubID() << '"' << jou->getTitle() << '"' << '"' << jou->getAuthor() << '"' << '"' << jou->getGenre() << '"' << jou->getPgCount() << jou->getAvai() << jou->getVol() << endl;
+        }
     }
     writerP.close();
 
@@ -307,12 +328,12 @@ void Library::multiSearch(string data){
     //cout << "Please choose what you are searching for: \n1. Title, \n2. Author, \n3. Genre, \n4. Availability \n(0 to exit)" << endl;
     //cin >> choice;
     //switch(choice){
-    for (Publication pb : readingList){
-        if(pb.getTitle() == data){
+    for (Publication* pb : readingList){
+        if(pb->getTitle() == data){
             cout << "found title" << endl;
-        }else if(pb.getAuthor() == data){
+        }else if(pb->getAuthor() == data){
             cout << "found author" << endl;
-        }else if(pb.getGenre() == data){
+        }else if(pb->getGenre() == data){
             cout << "found author" << endl;
         }//ADD FOR AVAILABILITY
     }

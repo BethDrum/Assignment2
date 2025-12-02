@@ -32,6 +32,9 @@ int main(){
         int num = 0;
         string name = "";
         string mID = "";
+        string type = "";
+        int extraJInfo = 0;
+        int extraMInfo = 0;
 
         cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members" << endl;
         cin >> choice1;
@@ -64,14 +67,31 @@ int main(){
                         num = rand() % 201;
                         bID = "B"+to_string(num);
                         cout << bID << endl;
+                        //get type
+                        cout << "Please enter B for book, M for magazine or J for journal." << endl;
+                        cin >> type;
+                        if (type != "B" || type != "M" || type != "J"){ //-------------------------------------------------------------------------------------HERE
+                            cout << "Incorrect entered value, \nPlease enter B for book, M for magazine or J for journal." << endl;
+                            cin >> type;
+                        }
 
-                        Lib.addLibBook(bID, ti, au, gen, pgC);
+                        if (type == "B"){
+                            Lib.addLibBook(bID, ti, au, gen, pgC);
+                        }else if (type == "M"){
+                            cout << "Please enter the issue number:" << endl;
+                            cin >> extraMInfo;
+                            Lib.addLibMag(bID, ti, au, gen, pgC, extraMInfo);
+                        }else if (type == "J"){
+                            cout << "Please enter the volume:" <<endl;
+                            cin >> extraJInfo;
+                            Lib.addLibJour(bID, ti, au, gen, pgC, extraJInfo);
+                        }
                         break;
                     case 2:
                         cout << "Remove Book selected.\n--------------\n";
                         cout << "Enter the Book ID of the book you wish to remove: " << endl;
                         cin >> bID;
-                        Lib.removeLibBook(bID);
+                        Lib.removeLibPub(bID);
                         break;
                     case 3:
                         cout << "Search for Book selected.\n--------------\n";
@@ -81,7 +101,8 @@ int main(){
                         break;
                     case 4:
                         cout << "Display all Books selected.\n--------------\n" << endl;
-                        Lib.dispAllBook();
+                        Lib.dispAllPub();
+                        break;
                     case 5:
                         cout << "View all registered members selected.\n--------------\n";
                         Lib.dispAllMemb();
@@ -121,26 +142,29 @@ int main(){
                     //find the member they are trying to do stuff with and store
                     cout << "Please enter the ID or name of the member you are:" << endl;
                     cin >> mID;
+                    /**
                     while (!Lib.searchForMemb(mID)){
                         cout << "Error: The user does not exist. Please enter again" << endl;
                         cout << "Please enter the ID or name of the member you are:" << endl;
                         cin >> mID;
-                    }
+                    }*/
 
                     //start switch for this 
-                    cout << "Enter a number to make your selection: \n1. Borrow a book \n2. Return a book" << endl;
+                    cout << "Enter a number to make your selection: \n1. Borrow a book \n2. Return a book \n3. View all borrowed books" << endl;
                     cin >> choice3;
                     switch(choice3){
                         case 1:
                             cout << "Enter the ID of the book you wish to borrow: " << endl;
                             cin >> bID;
-                            Lib.borrowBook(bID, mID);
+                            Lib.borrowPub(bID, mID);
                             break;
                         case 2:
                             cout << "Enter the ID of the book you wish to return." << endl;
                             cin >> bID;
-                            Lib.returnBook(bID, mID);
+                            Lib.returnPub(bID, mID);
                             break;
+                        case 3:
+                            Lib.viewBorrowed(mID);
                         case 0:
                             cout << "Exiting...\n--------------\n";
                             doneMem == true;

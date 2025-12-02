@@ -1,5 +1,6 @@
 #include "Publication.h"
 #include "Member.h"
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -64,13 +65,12 @@ Member::Member(string membID, string nam){
     bookList.clear();
 }
 
-//print all books - WHY NOT WORKING
-/** 
-void Member::allBooks(){
-    for (Publication pb : pubList){
-        cout << pb.getPubID();
+
+void Member::viewBooks(){
+    for (string bk : bookList){
+        cout << bk;
     }
-}*/
+}
 
 void Member::viewMemb(){
     cout << "ID: " << getMembID() << " Name: " << getName();
