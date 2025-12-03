@@ -34,6 +34,8 @@ int main(){
         string type = "";
         int extraJInfo = 0;
         int extraMInfo = 0;
+        string typeSearch = "";
+        string searchID = "";
 
         cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members" << endl;
         cin >> choice1;
@@ -53,11 +55,12 @@ int main(){
                         //get all values from user
                         cout << "Add a book selected.\n--------------\n";
                         cout << "Enter Title: " << endl;
-                        cin >> ti;
+                        cin.ignore();
+                        getline(cin, ti);
                         cout << "Enter Author: " << endl;
-                        cin >> au;
+                        getline(cin, au);
                         cout << "Enter Genre: " << endl;
-                        cin >> gen;
+                        getline(cin, gen);
                         cout << "Enter Page Count: " << endl;
                         cin >> pgC;
 
@@ -67,12 +70,12 @@ int main(){
                         bID = "B"+to_string(num);
                         cout << bID << endl;
                         //get type
-                        cout << "Please enter B for book, M for magazine or J for journal." << endl;
-                        cin >> type;
-                        if (type != "B" || type != "M" || type != "J"){ //-------------------------------------------------------------------------------------HERE
+                        //cout << "Please enter B for book, M for magazine or J for journal." << endl;
+                        //cin >> type;
+                        do{
                             cout << "Incorrect entered value, \nPlease enter B for book, M for magazine or J for journal." << endl;
                             cin >> type;
-                        }
+                        }while (type != "B" && type != "M" && type != "J");
 
                         if (type == "B"){
                             Lib.addLibBook(bID, ti, au, gen, pgC);
@@ -94,9 +97,12 @@ int main(){
                         break;
                     case 3:
                         cout << "Search for Book selected.\n--------------\n";
-                        cout << "Enter the Book ID or title to search for:" << endl;
-                        cin >> bID;
-                        Lib.searchForBook(bID);
+                        cout << "Please enter if you are searching for: \nT: Title \nA: Author \nG: Genre \nAV: Availiability \nID: Book ID" << endl;
+                        cin >> typeSearch;
+                        cout << "Please enter the search term: " << endl;
+                        cin >> searchID;
+                        Lib.searchForBook(searchID, typeSearch);
+                        exit(0);
                         break;
                     case 4:
                         cout << "Display all Books selected.\n--------------\n" << endl;
@@ -105,6 +111,7 @@ int main(){
                     case 5:
                         cout << "View all registered members selected.\n--------------\n";
                         Lib.dispAllMemb();
+                        cout << endl;
                         break;
                     case 6:
                         cout << "Add new member selected.\n--------------\n";
@@ -125,7 +132,7 @@ int main(){
                         break;
                     case 8:
                         cout << "Load in previous saved library selected.\n--------------\n"; //NEEDS THING TO ENTER YOUR OWN FILE--------------------------------------
-                        Lib.readFromFile("books.txt");
+                        Lib.readFromFile("books.txt", "members.txt");
                         break;
                     case 9:
                         cout << "Save current library selected.\n--------------\n";
@@ -168,7 +175,7 @@ int main(){
                             break;
                         case 0:
                             cout << "Exiting...\n--------------\n";
-                            doneMem == true;
+                            doneMem = true;
                             break;
                     }
                 }

@@ -68,11 +68,19 @@ Member::Member(string membID, string nam){
 
 void Member::viewBooks(){
     for (string bk : bookList){
-        cout << bk << endl;
+        cout << bk << " ";
     }
 }
 
 void Member::viewMemb(){
     cout << "ID: " << getMembID() << " Name: " << getName();
+}
+
+vector<string> Member::getAllBooks(){
+    vector<string> allB;
+    for (string bk : bookList){
+        allB.push_back(bk);
+    }
+    return allB;
 }
 

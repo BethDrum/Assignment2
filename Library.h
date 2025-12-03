@@ -36,10 +36,12 @@ class Library{
         void viewBorrowed(string mID);
 
         vector<string> split(string str);
-        int readFromFile(string fileName);
-        void searchForBook(string searchID);
+        int readFromFile(string fileNameB, string filenameM);
+        void searchForBook(string searchID, string type);
         bool saveToFile();
         void checkReturn(int outYr, int outMon, int outDay); //MATHS AND NEED TO KNOW USEAGE TO FIMISH
         void multiSearch(string data); //NEEDS TEMPALTE SO CAN SEARCH AVAILIABOLITY TOO
+        int fuzzySearch(string check, string change);
+        int LevenshteinFunc(string str1, string str2, int m, int n);
 };
 #endif

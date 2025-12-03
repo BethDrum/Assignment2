@@ -111,18 +111,6 @@ bool Library::removeLibPub(string readingID){
     }
 }
 
-
-//search for book
-void Library::searchForBook(string searchID){
-    for (Publication* pb : readingList){
-        if(pb->getPubID() == searchID){
-            cout << "found" << endl;
-        }else if(pb->getTitle() == searchID){
-            cout << "found" << endl;
-        }
-    }
-}
-
 //display all books
 void Library::dispAllPub(){
     for (Publication* pb : readingList){
@@ -142,13 +130,14 @@ void Library::dispAllPub(){
 //display all registerd members
 void Library::dispAllMemb(){
     for (Member mem : membList){
-        cout << mem.getName() << " " << mem.getMembID() << "\n";
+        cout << mem.getName() << " " << mem.getMembID() << " Books borrowed: ";
+        mem.viewBooks();
     }
 }
 
 //borrow book
 bool Library::borrowPub(string pbID, string memID){
-    for (Member mem : membList){
+    for (Member& mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
             //set the book in the library to be unavailiable
@@ -203,7 +192,7 @@ bool Library::returnPub(string pbID, string memID){
 }
 
 void Library::viewBorrowed(string mID){
-    for (Member mem : membList){
+    for (Member& mem : membList){
         //if the member exists
         if (mem.getMembID() == mID){
             mem.viewBooks();
@@ -216,24 +205,28 @@ vector<string> Library::split(string str){
     vector<string> tokens;
     stringstream ss(str);
 
-    while (ss >> token){
+    while (ss){
+        while (isspace(ss.peek())){
+            ss.get();
+        }
         //check if there is a quote (for the book title, author etc to not be seperated)
         if (ss.peek() == '"'){
             ss.get();
             getline(ss, token, '"');
         }else{
-            ss >> token;
+            if(!(ss >> token)){
+                break;
+            };
         }
-        if (!token.empty()){
-            tokens.push_back(token);
-        }
+        tokens.push_back(token);
     }
     return tokens;
 }   
 
 //read library info from file
-int Library::readFromFile(string fileName){
+int Library::readFromFile(string fileNameBooks, string fileNameMembers){
     string lines;
+    string mLines;
     vector<string> v;
     string id;
     string ti;
@@ -244,21 +237,24 @@ int Library::readFromFile(string fileName){
     string type;
     string extraInfo;
 
+    string mID;
+    string mName;
+    vector <string> books;
+
 
 
     //open file
-    ifstream reader(fileName);
+    ifstream reader(fileNameBooks);
 
     if (!reader){
-        cout << "Error on opening file" << endl;
+        cout << "Error on opening books file" << endl;
     }
 
     //read in full line
     while(getline(reader, lines)){
-        cout << lines <<endl;
-
         //split by the spaces
         vector<string> single = split(lines);
+        //assign spaces to their acccording things
         id = single[0];
         ti = single[1];
         au = single[2];
@@ -266,15 +262,17 @@ int Library::readFromFile(string fileName){
         pgC = stoi(single[4]);
         ava = stoi(single[5]);
 
-        if (single.length() == 6){
+        //if only 6 values in this line, its a book so add as that
+        if (single.size() == 6){
             Book book(id, ti, au, gen, pgC, ava);
             try{
                 readingList.push_back(new Book(book));
             } catch (exception e){
                 cout << "Error adding book" << endl;
             }
+        //else its a journal or magazine, check type and store correspondingly
         }else{
-            extraInfo = single[6];
+            int extraInfo = stoi(single[6]);
             type = single[7];
             if (type == "MAG"){
                 Magazine mag(id, ti, au, gen, pgC, extraInfo, ava);
@@ -293,13 +291,38 @@ int Library::readFromFile(string fileName){
             }
         }
     }
-
     reader.close();
-    
-    for(size_t i=0; i<v.size(); i++){
-        cout << v[i] << endl;
+
+    //for members
+    ifstream reader2(fileNameMembers);
+
+    if (!reader2){
+        cout << "Error on opening members file" << endl;
     }
 
+    //read in full line
+    while(getline(reader2, mLines)){
+        //split by the spaces
+        vector<string> mSingle = split(mLines);
+        //assign spaces to their acccording things
+        mID = mSingle[0];
+        mName = mSingle[1];
+        Member memb(mID, mName);
+        //book list
+        for (int i = 2; i < mSingle.size(); i++){
+            if (!memb.addPub(mSingle[i])){
+                cout << "Error when adding publication to member class." << endl;
+            }
+        }
+        try{
+            membList.push_back(memb);
+        }catch (exception e){
+            cout << "Error adding to vector" << endl;
+        }
+
+    }
+    //close reader and return
+    reader2.close();
     return 0;
 }
 
@@ -309,7 +332,7 @@ bool Library::saveToFile(){
     //string fileN = filename+".txt";
     //cout << fileN << endl;
 
-    ofstream writerP("books.txt");
+    ofstream writerP("booksTEST.txt");
 
     if (!writerP){
         cerr << "Error opening file for output" << endl;
@@ -319,25 +342,31 @@ bool Library::saveToFile(){
     for (Publication* pb : readingList){
         if (pb->getType()=="BOOK"){
             Book* bk = static_cast<Book*>(pb);
-            writerP << pb->getPubID() << '"' << pb->getTitle() << '"' << '"' << pb->getAuthor() << '"' << '"' << pb->getGenre() << '"' << pb->getPgCount() << pb->getAvai() << endl;
+            writerP << pb->getPubID() << " " << '"' << pb->getTitle() << '"' << " " << '"' << pb->getAuthor() << '"' << " " << '"' << pb->getGenre() << '"' << " " << pb->getPgCount() << " " << pb->getAvai() << endl;
         }else if(pb->getType()=="MAG"){
             Magazine* mg = static_cast<Magazine*>(pb);
-            writerP << mg->getPubID() << '"' << mg->getTitle() << '"' << '"' << mg->getAuthor() << '"' << '"' << mg->getGenre() << '"' << mg->getPgCount() << mg->getAvai() << mg->getIssueN() << endl;
+            writerP << mg->getPubID() << " " << '"' << mg->getTitle() << '"' << " " << '"' << mg->getAuthor() << '"' << " " << '"' << mg->getGenre() << '"' << " " << mg->getPgCount() << " " << mg->getAvai() << " " << mg->getIssueN() << endl;
         }else if(pb->getType()=="JOUR"){
             Journal* jou = static_cast<Journal*>(pb);
-            writerP << jou->getPubID() << '"' << jou->getTitle() << '"' << '"' << jou->getAuthor() << '"' << '"' << jou->getGenre() << '"' << jou->getPgCount() << jou->getAvai() << jou->getVol() << endl;
+            writerP << jou->getPubID() << " " << '"' << jou->getTitle() << '"' << " " << '"' << jou->getAuthor() << '"' << " " << '"' << jou->getGenre() << '"' << " " << jou->getPgCount() << " " << jou->getAvai() << " " << jou->getVol() << endl;
         }
     }
     writerP.close();
 
-    ofstream writerM("members.txt");
+    ofstream writerM("membersTEST.txt");
     if (!writerM){
         cerr << "Error opening file for output" << endl;
         return false;
     }
 
     for (Member mem : membList){
-        writerM << mem.getMembID() << mem.getName() << endl;
+        vector<string> allBooks;
+        allBooks = mem.getAllBooks();
+        writerM << mem.getMembID() << " " << mem.getName() << " ";
+        for (int i=0; i< allBooks.size(); i++){
+            writerM << allBooks[i] << " ";
+        }
+        writerM << endl;
     }
     writerM.close();
 
@@ -367,6 +396,7 @@ void Library::checkReturn(int outYr, int outMon, int outDay){
     //check if past current day
 }
 
+/** 
 //multi criteria search - title, author, genre, availiability NEEDS TEMPLATE SO CAN DO AVAILIABILITY - ALSO LIKE... IS THIS A FILTER THING???
 void Library::multiSearch(string data){
     int choice;
@@ -382,10 +412,95 @@ void Library::multiSearch(string data){
             cout << "found author" << endl;
         }//ADD FOR AVAILABILITY
     }
+}*/
+
+//search for book
+void Library::searchForBook(string searchID, string type){
+    bool found = false;
+    int distan = 0;
+    string bestCase = "";
+    int topDist = 100000000;
+    string bestMatch = "";
+
+    for (Publication* pb : readingList){
+        if (type ==  "T"){
+            if (pb->getTitle() == searchID){
+                pb->viewInfo(); //ONLY BE ONE
+                found = true;
+                return;
+            }
+        }else if (type == "A"){ //needs to print all availiable - CHECK
+            if (pb->getAuthor() == searchID){ 
+                pb->viewInfo();
+                found = true;
+            }
+        }else if (type == "G"){
+            if (pb->getGenre() == searchID){ // neds to print all with that genre? - CHECK
+                pb->viewInfo();
+                found = true;
+            }
+        }else if (type == "AV"){
+            if (pb->getAvai() == stoi(searchID)){ 
+                pb->viewInfo();
+                found = true;
+            }
+        }else if (type == "ID"){
+            if (pb->getPubID() == searchID){ //ONLY BE ONE
+                pb->viewInfo();
+                found = true;
+                return;
+            }
+        }
+
+        if (!found){
+            if (type ==  "T"){
+                distan = fuzzySearch(searchID, pb->getTitle());
+                if (distan <= topDist){
+                    topDist = distan;
+                    bestMatch = pb->getPubID();
+                }
+            }else if (type == "A"){
+                distan = fuzzySearch(searchID, pb->getAuthor());
+                if (distan <= topDist){
+                    topDist = distan;
+                    bestMatch = pb->getPubID();
+                }
+            }else if (type == "G"){
+                distan = fuzzySearch(searchID, pb->getGenre());
+                if (distan <= topDist){
+                    topDist = distan;
+                    bestMatch = pb->getPubID();
+                }
+            }else if (type == "AV"){ //DOES THIS NEED FUZZY SEARCHED???
+                //----
+            }else if (type == "ID"){
+                distan = fuzzySearch(searchID, pb->getPubID());
+                if (distan <= topDist){
+                    topDist = distan;
+                    bestMatch = pb->getPubID();
+                }
+            }
+        }
+    }
+
+    for (Publication* pbF : readingList){
+        if(pbF->getPubID() == bestMatch){ //print all matches
+            pbF->viewInfo();
+        }
+    }
+}
+
+int Library::fuzzySearch(string check, string change){
+    //do repetitivly through the entire list with str2 changing to be the next in the list, keeping track of ID and distance away for each - smallest distance is best match and should be used
+    string str1 = check;
+    string str2 = change;
+
+    int dist = LevenshteinFunc(str1, str2, str1.length(), str2.length());
+    return dist;
 }
 
 //levenshtein function for fuzzy search - compare simelarity of searched to all names in the list and highest simelarity is shown to user
-int LevenshteinFunc(string str1, string str2, int m, int n){
+int Library::LevenshteinFunc(string str1, string str2, int m, int n){
     //ensure books are not empty
     if (m == 0){
         return n;
@@ -395,24 +510,18 @@ int LevenshteinFunc(string str1, string str2, int m, int n){
     }
 
     if (str1[m-1] == str2[n-1]){
-        return LevenshteinFunc(str1, str2, m-1, n-1);
+        return LevenshteinFunc(str1, str2, m-1,
+                                n-1);
     }
-    return 1
+    return 1 
         +min(
             //insert
             LevenshteinFunc(str1, str2, m, n-1), 
             min(
                 //remove
-                LevenshteinFunc(str1, str2, m-1, n),
+                LevenshteinFunc(str1, str2, m-1, 
+                                    n),
                 //replace
-                LevenshteinFunc(str1, str2, m-1, n-1)));
-}
-
-void fuzzySearch(){
-    //do repetitivly through the entire list with str2 changing to be the next in the list, keeping track of ID and distance away for each - smallest distance is best match and should be used
-    string str1 = "cat";
-    string str2 = "mat";
-
-    int dist = LevenshteinFunc(str1, str2, str1.length(), str2.length());
-    cout << "Distance: " << dist << endl;
+                LevenshteinFunc(str1, str2, m-1,
+                                    n-1)));
 }

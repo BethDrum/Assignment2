@@ -24,6 +24,7 @@ class Member{
         Member(string membID, string nam);
         void viewBooks();
         void viewMemb();
+        vector<string> getAllBooks();
 };
 
 #endif
