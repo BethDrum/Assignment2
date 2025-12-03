@@ -68,7 +68,7 @@ Member::Member(string membID, string nam){
 
 void Member::viewBooks(){
     for (string bk : bookList){
-        cout << bk;
+        cout << bk << endl;
     }
 }
 

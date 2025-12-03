@@ -224,7 +224,9 @@ vector<string> Library::split(string str){
         }else{
             ss >> token;
         }
-        tokens.push_back(token);
+        if (!token.empty()){
+            tokens.push_back(token);
+        }
     }
     return tokens;
 }   
@@ -233,6 +235,16 @@ vector<string> Library::split(string str){
 int Library::readFromFile(string fileName){
     string lines;
     vector<string> v;
+    string id;
+    string ti;
+    string au;
+    string gen;
+    int pgC;
+    int ava;
+    string type;
+    string extraInfo;
+
+
 
     //open file
     ifstream reader(fileName);
@@ -241,11 +253,44 @@ int Library::readFromFile(string fileName){
         cout << "Error on opening file" << endl;
     }
 
+    //read in full line
     while(getline(reader, lines)){
+        cout << lines <<endl;
+
+        //split by the spaces
         vector<string> single = split(lines);
-        
-        for (string s : single){
-            v.push_back(s);
+        id = single[0];
+        ti = single[1];
+        au = single[2];
+        gen = single[3];
+        pgC = stoi(single[4]);
+        ava = stoi(single[5]);
+
+        if (single.length() == 6){
+            Book book(id, ti, au, gen, pgC, ava);
+            try{
+                readingList.push_back(new Book(book));
+            } catch (exception e){
+                cout << "Error adding book" << endl;
+            }
+        }else{
+            extraInfo = single[6];
+            type = single[7];
+            if (type == "MAG"){
+                Magazine mag(id, ti, au, gen, pgC, extraInfo, ava);
+                try{
+                readingList.push_back(new Magazine(mag));
+                } catch (exception e){
+                    cout << "Error adding journal" << endl;
+                }
+            }if (type == "JOUR"){
+                Journal jour(id, ti, au, gen, pgC, extraInfo, ava);
+                try{
+                    readingList.push_back(new Journal(jour));
+                } catch (exception e){
+                    cout << "Error adding journal" << endl;
+                }
+            }
         }
     }
 

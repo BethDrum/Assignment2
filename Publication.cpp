@@ -116,6 +116,17 @@ Magazine::Magazine(string pID, string ti, string au, string gen, int pgC, int is
     type = "MAG";
 }
 
+Magazine::Magazine(string pID, string ti, string au, string gen, int pgC, int issueN, int ava){
+    pubID = pID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = ava;
+    issueNum = issueN;
+    type = "MAG";
+}
+
 //view info
 void Magazine::viewInfo() {
     cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Issue Number: " << issueNum << " Availiability: " << avai << endl;
@@ -138,6 +149,17 @@ Journal::Journal(string pID, string ti, string au, string gen, int pgC, int vol)
     genre = gen;
     pgCount = pgC;
     avai = 1;
+    volume = vol;
+    type = "JOUR";
+}
+
+Journal::Journal(string pID, string ti, string au, string gen, int pgC, int vol, int ava){
+    pubID = pID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = ava;
     volume = vol;
     type = "JOUR";
 }

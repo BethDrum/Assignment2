@@ -47,6 +47,7 @@ class Magazine : public Publication{
         int getIssueN();
         void setIssueN(int newIssueN);
         Magazine(string pID, string ti, string au, string gen, int pgC, int issueN);
+        Magazine(string pID, string ti, string au, string gen, int pgC, int issueN, int ava);
         void viewInfo();
 };
 
@@ -57,6 +58,7 @@ class Journal : public Publication{
         int getVol();
         void setVol(int newVol);
         Journal(string pID, string ti, string au, string gen, int pgC, int vol);
+        Journal(string pID, string ti, string au, string gen, int pgC, int vol, int ava);
         void viewInfo();
 };
 

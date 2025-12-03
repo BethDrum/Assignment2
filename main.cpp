@@ -9,7 +9,6 @@ using namespace std;
 
 int main(){
     Library Lib;
-    //Lib.readFromFile("books.txt");
     int choice1;
     int choice2;
     int choice3;
@@ -125,7 +124,8 @@ int main(){
                         Lib.removeMembList(mID);
                         break;
                     case 8:
-                        cout << "Load in previous saved library selected.\n--------------\n";
+                        cout << "Load in previous saved library selected.\n--------------\n"; //NEEDS THING TO ENTER YOUR OWN FILE--------------------------------------
+                        Lib.readFromFile("books.txt");
                         break;
                     case 9:
                         cout << "Save current library selected.\n--------------\n";
@@ -138,10 +138,10 @@ int main(){
 
             case 2:
                 cout << "You have selected Member options.\n--------------\n";
+                //find the member they are trying to do stuff with and store
+                cout << "Please enter the ID or name of the member you are:" << endl;
+                cin >> mID;
                 while (doneMem == false){
-                    //find the member they are trying to do stuff with and store
-                    cout << "Please enter the ID or name of the member you are:" << endl;
-                    cin >> mID;
                     /**
                     while (!Lib.searchForMemb(mID)){
                         cout << "Error: The user does not exist. Please enter again" << endl;
@@ -165,6 +165,7 @@ int main(){
                             break;
                         case 3:
                             Lib.viewBorrowed(mID);
+                            break;
                         case 0:
                             cout << "Exiting...\n--------------\n";
                             doneMem == true;
