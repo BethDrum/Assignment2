@@ -33,8 +33,8 @@ class Member{
         void setDateB(time_t date);
         time_t getDateB();
         
-        template <typename T>
-        bool addPub(T pbID);
+        //template <typename T>
+        bool addPub(string pbID);
 };
 
 #endif

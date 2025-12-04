@@ -1,5 +1,3 @@
-#include "Member.h"
-#include "Publication.h"
 #include "Library.h"
 
 #include <string>

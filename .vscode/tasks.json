@@ -12,7 +12,8 @@
                 "main.cpp",
                 "Library.cpp",
                 "Member.cpp",
-                "Book.cpp"
+                "Book.cpp",
+                "RunFunc.cpp"
             ],
             "options": {
                 "cwd": "C:/msys64/ucrt64/bin"
