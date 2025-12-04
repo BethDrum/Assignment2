@@ -7,6 +7,8 @@
 #include <fstream>
 #include <ctime>
 #include <stdexcept>
+#include <algorithm>
+#include <cctype>
 using namespace std;
 
 //to add a member
@@ -462,6 +464,13 @@ time_t Library::getDate(){
     return currentDate;
 }
 
+/**
+auto checkString = [](string s){
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){return std::tolower(c);});
+    s.erase(s.find_last_not_of("\n\r\t")+1);
+    return s;
+};*/
+
 //search for book
 bool Library::searchForBook(string searchID, string type){
     bool found = false;
@@ -472,11 +481,19 @@ bool Library::searchForBook(string searchID, string type){
     bool wildcardFound = false;
     string wildMatch = "";
 
+    cout << "in search function" << endl;
     for (Publication* pb : readingList){
+        if (!pb){
+            cout << "Null pointer in readingList"<< endl;
+            continue;
+        }
+        cout << "loop:" << pb->getPubID() << endl;
+        //cout << "in loop checks" << pb->getTitle() << " with " << searchID << endl;
         if (type ==  "T"){
             if (pb->getTitle() == searchID){
                 pb->viewInfo(); //ONLY BE ONE
                 found = true;
+                return found;
             }
         }else if (type == "A"){ //needs to print all availiable
             if (pb->getAuthor() == searchID){ 
@@ -488,87 +505,81 @@ bool Library::searchForBook(string searchID, string type){
                 pb->viewInfo();
                 found = true;
             }
+            cout << "Gen checked" << endl;
         }else if (type == "AV"){
-            if (pb->getAvai() == stoi(searchID)){ 
-                pb->viewInfo();
-                found = true;
+            try{
+                int a = stoi(searchID);
+                if (pb->getAvai() == a){ 
+                    pb->viewInfo();
+                    found = true;
+                }
+            }catch (const exception& e){
+                //search term must be a number. if not it will throw a error
+                cerr << "Cannot be av search" << endl;
             }
         }else if (type == "ID"){
             if (pb->getPubID() == searchID){ //ONLY BE ONE
                 pb->viewInfo();
                 found = true;
+                return found;
             }
+            cout << "ID checked";
         }
 
         if (!found){
             string temp;
             //availiability is not included in the fuzzy or wildcard search as it is 1 character and so forth cannot.
             if (type ==  "T"){
-                temp = pb->getTitle();
-                /**
-                //wilcard
+                //wildcard
                 if (wildcardS(pb->getTitle(), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
-                    found = true;
-                    break;
                 }
                 //fuzzy
                 distan = fuzzySearch(searchID, pb->getTitle());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }*/
+                }
             }else if (type == "A"){
-                temp = pb->getAuthor();
-                //wilcard
-                /** 
+                //wildcard
                 if (wildcardS(pb->getAuthor(), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
-                    found = true;
-                    break;
                 }
                 //fuzzy
                 distan = fuzzySearch(searchID, pb->getAuthor());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }*/
-
+                }
             }else if (type == "G"){
-                temp = pb->getGenre();
-                //wilcard
-                /**
+                //wildcard
                 if (wildcardS(pb->getGenre(), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
-                    found = true;
-                    break;
                 }
                 //fuzzy
                 distan = fuzzySearch(searchID, pb->getGenre());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }*/
+                }
             }else if (type == "ID"){
                 temp = pb->getPubID();
-                //wilcard
-                /**
+                //wildcard
                 if (wildcardS(pb->getPubID(), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
-                    found = true;
-                    break;
                 }
                 //fuzzy
                 distan = fuzzySearch(searchID, pb->getPubID());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }*/
+                }
             }
+
             if (!temp.empty()){
                 if (wildcardS(temp, searchID)){
                     wildMatch = pb->getPubID();

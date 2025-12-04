@@ -59,6 +59,7 @@ void RunFunc::runSearch(){
     cout << "Please enter the search term: " << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, searchID);
+    cout << searchID << endl;
     Lib.searchForBook(searchID, typeSearch);
 }
 
