@@ -84,7 +84,9 @@ void RunFunc::runAddMember(){
 void RunFunc::runRemoveMember(){
     cout << "Enter the ID of the member you wish to delete: " << endl;
     cin >> mID;
-    Lib.removeMembList(mID);
+    if (!Lib.removeMembList(mID)){
+        cout << "The member does not exist";
+    }
 }
 
 void RunFunc::runReadFile(){ //ADD THE USER ENTERING THEIR OWN FILE ---------------------------------------
@@ -98,7 +100,11 @@ void RunFunc::runSaveFile(){
 void RunFunc::runBorrow(){
     cout << "Enter the ID of the book you wish to borrow: " << endl;
     cin >> bID;
-    Lib.borrowPub(bID, mID);
+    if (Lib.borrowPub(bID, mID)){
+        cout << "The book is now borrowed." << endl;
+    }else{
+        cout << "Error occured: Book not availiable" << endl;
+    }
 }
 
 void RunFunc::runReturn(){

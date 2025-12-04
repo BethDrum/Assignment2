@@ -14,29 +14,29 @@ using namespace std;
 
 class Library{
     private:
-        vector<Member> membList;
+        vector<Member<string>> membList;
         vector<Publication*> readingList;
 
     public:
-        bool addMembList(string membID, string nam);
+        void addMembList(string membID, string nam);
         bool removeMembList(string membID);
         bool searchForMemb(string searchID);
 
-        bool addLibBook(string pID, string ti, string au, string gen, int pgC);
-        bool addLibJour(string pID, string ti, string au, string gen, int pgC, int vol);
-        bool addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
-        bool removeLibPub(string pubID);
+        void addLibBook(string pID, string ti, string au, string gen, int pgC);
+        void addLibJour(string pID, string ti, string au, string gen, int pgC, int vol);
+        void addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
+        void removeLibPub(string pubID);
 
         void dispAllPub(); //ERROR
         void dispAllMemb();
 
         bool borrowPub(string pbID, string memID);
-        bool returnPub(string pbID, string memID);
+        void returnPub(string pbID, string memID);
         void viewBorrowed(string mID);
 
         vector<string> split(string str);
-        int readFromFile(string fileNameB, string filenameM);
-        void searchForBook(string searchID, string type);
+        bool readFromFile(string fileNameB, string filenameM);
+        bool searchForBook(string searchID, string type);
         bool saveToFile();
         double checkPenalty(time_t borrDate, string type);
         time_t getDate(); //MATHS AND NEED TO KNOW USEAGE TO FIMISH

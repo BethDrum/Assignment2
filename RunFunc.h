@@ -11,6 +11,7 @@ using namespace std;
 
 class RunFunc{
     private:
+        //initialise all many needed fields
         Library Lib;
         int choice1;
         int choice2;
