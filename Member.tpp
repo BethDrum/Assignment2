@@ -24,7 +24,8 @@ void Member::setName(string newName){
 }
 
 //to add a book to the members book list ('Borrow')
-bool Member::addPub(string pbID){
+template <typename T>
+bool Member::addPub(T pbID){
     try{
         bookList.push_back(pbID);
     }catch (exception e){

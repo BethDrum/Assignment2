@@ -7,6 +7,7 @@
 #include <iostream>
 using namespace std;
 
+//template <typename T>
 class Member{
     private: 
         string memberID;
@@ -20,7 +21,6 @@ class Member{
         void setMembID(string newMemID);
         string getName();
         void setName(string newName);
-        bool addPub(string pbID);
         //void addBook(Book bk);
         bool removePub(string pbID);
         bool addRes(string pID);
@@ -32,6 +32,9 @@ class Member{
         vector<string> getAllBooks();
         void setDateB(time_t date);
         time_t getDateB();
+        
+        template <typename T>
+        bool addPub(T pbID);
 };
 
 #endif
