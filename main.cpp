@@ -12,22 +12,22 @@ int main(){
     int choice2;
     int choice3;
     bool doneAll = false;
+    string bID = "";
+    string ti = "";
+    string au = "";
+    string gen = "";
+    int pgC = 0;
+    int num = 0;
+    string name = "";
+    string mID = "";
+    string type = "";
+    int extraJInfo = 0;
+    int extraMInfo = 0;
+    string typeSearch = "";
+    string searchID = "";
 
     //menu for testing/running
     while (doneAll == false){
-        string bID = "";
-        string ti = "";
-        string au = "";
-        string gen = "";
-        int pgC = 0;
-        int num = 0;
-        string name = "";
-        string mID = "";
-        string type = "";
-        int extraJInfo = 0;
-        int extraMInfo = 0;
-        string typeSearch = "";
-        string searchID = "";
         bool doneAdm = false;
         bool doneMem = false;
 
@@ -91,6 +91,11 @@ int main(){
                 cout << "Please enter the ID or name of the member you are:" << endl;
                 cin >> mID;
                 while (doneMem == false){
+                    bool checkM = run.checkMemb(mID);
+                    if (!checkM){
+                        cout << "Member does not exist" << endl;
+                        break;
+                    }
                     cout << "Enter a number to make your selection: \n1. Borrow a book \n2. Return a book \n3. View all borrowed books" << endl;
                     cin >> choice3;
                     switch(choice3){
@@ -102,6 +107,7 @@ int main(){
                             break;
                         case 3:
                             run.runViewBorrowed();
+                            break;
                         case 0:
                             cout << "Exiting...\n--------------\n";
                             doneMem = true;

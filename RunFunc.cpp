@@ -72,6 +72,10 @@ void RunFunc::runDisplayM(){
     cout << endl;
 }
 
+bool RunFunc::checkMemb(string mID){
+    return (Lib.checkMem(mID));
+}
+
 void RunFunc::runAddMember(){
     cout << "Please enter the member name: " << endl;
     cin >> name;

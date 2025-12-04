@@ -43,5 +43,6 @@ class Library{
         int fuzzySearch(string check, string change);
         int LevenshteinFunc(string str1, string str2, int m, int n);
         bool wildcardS(string searchID, string pattern);
+        bool checkMem(string mID);
 };
 #endif

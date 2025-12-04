@@ -125,7 +125,20 @@ void Library::dispAllMemb(){
     for (Member mem : membList){
         cout << mem.getName() << " " << mem.getMembID() << " Books borrowed: ";
         mem.readingList.viewBooks();
+        cout << endl;
     }
+}
+
+bool Library::checkMem(string mID){
+    cout << mID << endl;
+    for (Member mem : membList){
+        cout << mem.getMembID() << endl;
+        if (mem.getMembID() == mID){
+            cout << "M EXISTS" << endl;
+            return true;
+        }
+    }
+    return false;
 }
 
 //borrow book

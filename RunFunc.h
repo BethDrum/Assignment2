@@ -46,6 +46,7 @@ class RunFunc{
         void runBorrow();
         void runReturn();
         void runViewBorrowed();
+        bool checkMemb(string mID);
 };
 
 #endif
