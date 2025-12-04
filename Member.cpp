@@ -58,6 +58,43 @@ bool Member::removePub(string pubID){
     }
 }
 
+//add to reserved list
+bool Member::addRes(string pID){
+    try{
+        reserveList.push_back(pID);
+    }catch (exception e){
+        return false;
+    }
+    return true;
+}
+
+//remove from reserved list
+bool Member::removeRes(string pubID){
+    int i = 0;
+    for (string pb : reserveList){
+        if (pb == pubID){
+            try{
+                reserveList.erase(reserveList.begin() + i);
+            } catch (exception e){
+                //removal failed
+                return false;
+            }
+            return true;
+        }
+        i++;
+    }
+}
+
+bool Member::checkRes(string pubID){
+    for (string pb : reserveList){
+        if (pb == pubID){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 //constructor
 Member::Member(string membID, string nam){
     memberID = membID;
@@ -82,5 +119,13 @@ vector<string> Member::getAllBooks(){
         allB.push_back(bk);
     }
     return allB;
+}
+
+void Member::setDateB(time_t date){
+    dateBorrowed = date;
+}
+
+time_t Member::getDateB(){
+    return dateBorrowed;
 }
 

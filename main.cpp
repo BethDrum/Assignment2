@@ -138,6 +138,9 @@ int main(){
                         cout << "Save current library selected.\n--------------\n";
                         Lib.saveToFile();
                         break;
+                    case 10:
+                        Lib.getDate();
+                        break;
                     }
                 }   
                 break;

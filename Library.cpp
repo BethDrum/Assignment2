@@ -136,7 +136,8 @@ void Library::dispAllMemb(){
 }
 
 //borrow book
-bool Library::borrowPub(string pbID, string memID){
+bool Library::borrowPub(string pbID, string memID){ //INPUT VAL NEEDED
+    string resChoice = "";
     for (Member& mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
@@ -146,6 +147,16 @@ bool Library::borrowPub(string pbID, string memID){
                     //check if the book is availiable
                     if (pb->getAvai() == 0){
                         cout << "Publication not availiable" << endl;
+                        //give option to add to the reserved list
+                        do{
+                            cout << "Would you like to reserve this book? Y/N" << endl;
+                            cin.clear();
+                            cin >> resChoice;
+                        }while (resChoice != "Y" && resChoice != "N");
+                        
+                        if (resChoice == "Y"){
+                            mem.addRes(pb->getPubID());
+                        }
                         return false;
                     }
                     //set to false
@@ -155,6 +166,10 @@ bool Library::borrowPub(string pbID, string memID){
                         cout << "Error when adding publication to member class." << endl;
                         return false;
                     }else{
+                        //get the current date and assign it to the user to track when they borrowed it
+                        time_t date;
+                        date = getDate();
+                        mem.setDateB(date);
                         return true;
                     }
                 }
@@ -167,6 +182,10 @@ bool Library::borrowPub(string pbID, string memID){
 //return book
 bool Library::returnPub(string pbID, string memID){
     int i=0;
+    double penalty = 0.0;
+    bool returned = false;
+    string resChoice = "";
+
     for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
@@ -180,11 +199,34 @@ bool Library::returnPub(string pbID, string memID){
                 for (Publication* pb : readingList){
                     if (pb->getPubID() == pbID){
                         pb->setAvail(1);
+                        //check if theres a reservation in place for this book
+                    }
+                    //check for any penalites
+                    penalty = checkPenalty(mem.getDateB(), pb->getType());
+                    if (penalty > 0){
+                        cout << "You have a penalty fee to pay of: " << penalty << endl;
                     }
                 }
-                return true;
+                returned = true;
             }
             i++;
+        }
+    }
+
+    //check for reservation if its been returned
+    if (returned == true){
+        for (Member mem : membList){
+            if (mem.checkRes(pbID)){
+                do{
+                    cout << mem.getMembID() << " (" << mem.getName() << ") " << " The book you reserved - " << pbID << " - is now availiable. \nWould you like to borrow it? Y/N" << endl;
+                    cin.clear();
+                    cin >> resChoice;
+                }while (resChoice != "Y" && resChoice != "N");
+                
+                if (resChoice == "Y"){
+                    borrowPub(pbID, mem.getMembID());
+                }
+            }
         }
     }
     cout << "Memeber not found" << endl;
@@ -373,8 +415,35 @@ bool Library::saveToFile(){
     return true;
 }
 
+double Library::checkPenalty(time_t borDate, string type){
+    time_t currDate;
+    currDate = getDate();
+    double penalty = 0;
+
+    //returns seconds - so all compares must be changed to seconds
+    double diff = difftime(borDate, currDate);
+    cout << diff << endl;
+
+    if (type == "BOOK" && diff > 10*24*60*60){
+        //10 days for books
+        penalty = 10.00;
+        return penalty;
+    }else if (type == "MAG" && diff > 15*24*60*60){
+        //15 days
+        penalty = 15.00;
+        return penalty;
+    }else if (type == "MAG" && diff > 20*24*60*60){
+        //20 days
+        penalty = 20.00;
+        return penalty;
+    }else{
+        //no penalty
+        return penalty;
+    }
+}
+
 //JUST NEEDS MATH - should track due date then calc penalties - can be different for type
-void Library::checkReturn(int outYr, int outMon, int outDay){
+time_t Library::getDate(){
     //get day
     time_t currentDate = time(0);
     tm *currDate = localtime(&currentDate);
@@ -385,15 +454,16 @@ void Library::checkReturn(int outYr, int outMon, int outDay){
 
     int yr = 1900+currDate->tm_year;
     int mon = 1+currDate->tm_mon;
-    int day = currDate->tm_mday;
+    int day = currDate->tm_mday; 
 
-    //calculate penalty
-    //all have a month to return, 10 days late is £10, 20 days late is £20 and above a month late is £40
-    //if (){
+    //put into comparable format
+    struct tm date;
+    date.tm_year = yr;
+    date.tm_mday = day;
+    date.tm_mon = mon;
+    currentDate = mktime(&date);
 
-    //}
-
-    //check if past current day
+    return currentDate;
 }
 
 /** 
@@ -421,6 +491,8 @@ void Library::searchForBook(string searchID, string type){
     string bestCase = "";
     int topDist = 100000000;
     string bestMatch = "";
+    bool wildcardFound = false;
+    string wildMatch = "";
 
     for (Publication* pb : readingList){
         if (type ==  "T"){
@@ -429,7 +501,7 @@ void Library::searchForBook(string searchID, string type){
                 found = true;
                 return;
             }
-        }else if (type == "A"){ //needs to print all availiable - CHECK
+        }else if (type == "A"){ //needs to print all availiable
             if (pb->getAuthor() == searchID){ 
                 pb->viewInfo();
                 found = true;
@@ -453,38 +525,67 @@ void Library::searchForBook(string searchID, string type){
         }
 
         if (!found){
+            //availiability is not included in the fuzzy or wildcard search as it is 1 character and so forth cannot.
             if (type ==  "T"){
+                //wilcard
+                if (wildcardS(pb->getTitle(), searchID)){
+                    wildMatch = pb->getPubID();
+                    break;
+                }
+                //fuzzy
                 distan = fuzzySearch(searchID, pb->getTitle());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
             }else if (type == "A"){
+                //wilcard
+                if (wildcardS(pb->getAuthor(), searchID)){
+                    wildMatch = pb->getPubID();
+                    break;
+                }
+                //fuzzy
                 distan = fuzzySearch(searchID, pb->getAuthor());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
             }else if (type == "G"){
+                //wilcard
+                if (wildcardS(pb->getGenre(), searchID)){
+                    wildMatch = pb->getPubID();
+                    break;
+                }
+                //fuzzy
                 distan = fuzzySearch(searchID, pb->getGenre());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
-            }else if (type == "AV"){ //DOES THIS NEED FUZZY SEARCHED???
-                //----
             }else if (type == "ID"){
+                //wilcard
+                if (wildcardS(pb->getPubID(), searchID)){
+                    wildMatch = pb->getPubID();
+                    break;
+                }
+                //fuzzy
                 distan = fuzzySearch(searchID, pb->getPubID());
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
             }
+
+
         }
     }
 
     for (Publication* pbF : readingList){
         if(pbF->getPubID() == bestMatch){ //print all matches
+            pbF->viewInfo();
+        }
+
+        if (wildcardFound = true && pbF->getPubID() == wildMatch){
             pbF->viewInfo();
         }
     }
@@ -524,4 +625,42 @@ int Library::LevenshteinFunc(string str1, string str2, int m, int n){
                 //replace
                 LevenshteinFunc(str1, str2, m-1,
                                     n-1)));
+}
+
+//checks if the entered search matches any other values given.
+bool Library::wildcardS(string searchID, string pattern){
+    int sLen = searchID.length();
+    int patLen = pattern.length();
+    int i = 0;
+    int j = 0;
+    int startI = -1;
+    int match = 0;
+
+    while (i < sLen){
+
+        //if the next char is a ?
+        if (j < patLen && pattern[j] == '?' || pattern[j] == searchID[i]){
+            i++;
+            j++;
+        //if the next char is a *
+        }else if (j < patLen && pattern[j] == '*'){
+            startI = j;
+            match = i;
+            j++;
+        //no matching wildcard but there has been on previously
+        }else if(startI != -1){
+            j = startI + 1;
+            match ++;
+            i = match;
+        //else no wildcard
+        }else{
+            return false;
+        }
+    }
+
+    while (j < patLen && pattern[j] == '*'){
+        j++;
+    }
+
+    return j == patLen;
 }

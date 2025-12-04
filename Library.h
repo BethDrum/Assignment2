@@ -39,9 +39,10 @@ class Library{
         int readFromFile(string fileNameB, string filenameM);
         void searchForBook(string searchID, string type);
         bool saveToFile();
-        void checkReturn(int outYr, int outMon, int outDay); //MATHS AND NEED TO KNOW USEAGE TO FIMISH
-        void multiSearch(string data); //NEEDS TEMPALTE SO CAN SEARCH AVAILIABOLITY TOO
+        double checkPenalty(time_t borrDate, string type);
+        time_t getDate(); //MATHS AND NEED TO KNOW USEAGE TO FIMISH
         int fuzzySearch(string check, string change);
         int LevenshteinFunc(string str1, string str2, int m, int n);
+        bool wildcardS(string searchID, string pattern);
 };
 #endif
