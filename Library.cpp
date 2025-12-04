@@ -9,8 +9,6 @@
 #include <stdexcept>
 using namespace std;
 
-//template <class T>
-
 //to add a member
 void Library::addMembList(string membID, string nam){
     Member<string> memb(membID, nam);
@@ -479,40 +477,40 @@ bool Library::searchForBook(string searchID, string type){
             if (pb->getTitle() == searchID){
                 pb->viewInfo(); //ONLY BE ONE
                 found = true;
-                return true;
             }
         }else if (type == "A"){ //needs to print all availiable
             if (pb->getAuthor() == searchID){ 
                 pb->viewInfo();
                 found = true;
-                return true;
             }
         }else if (type == "G"){
-            if (pb->getGenre() == searchID){ // neds to print all with that genre? - CHECK
+            if (pb->getGenre() == searchID){ 
                 pb->viewInfo();
                 found = true;
-                return true;
             }
         }else if (type == "AV"){
             if (pb->getAvai() == stoi(searchID)){ 
                 pb->viewInfo();
                 found = true;
-                return true;
             }
         }else if (type == "ID"){
             if (pb->getPubID() == searchID){ //ONLY BE ONE
                 pb->viewInfo();
                 found = true;
-                return true;
             }
         }
 
         if (!found){
+            string temp;
             //availiability is not included in the fuzzy or wildcard search as it is 1 character and so forth cannot.
             if (type ==  "T"){
+                temp = pb->getTitle();
+                /**
                 //wilcard
                 if (wildcardS(pb->getTitle(), searchID)){
                     wildMatch = pb->getPubID();
+                    wildcardFound = true;
+                    found = true;
                     break;
                 }
                 //fuzzy
@@ -520,11 +518,15 @@ bool Library::searchForBook(string searchID, string type){
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }
+                }*/
             }else if (type == "A"){
+                temp = pb->getAuthor();
                 //wilcard
+                /** 
                 if (wildcardS(pb->getAuthor(), searchID)){
                     wildMatch = pb->getPubID();
+                    wildcardFound = true;
+                    found = true;
                     break;
                 }
                 //fuzzy
@@ -532,11 +534,16 @@ bool Library::searchForBook(string searchID, string type){
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }
+                }*/
+
             }else if (type == "G"){
+                temp = pb->getGenre();
                 //wilcard
+                /**
                 if (wildcardS(pb->getGenre(), searchID)){
                     wildMatch = pb->getPubID();
+                    wildcardFound = true;
+                    found = true;
                     break;
                 }
                 //fuzzy
@@ -544,11 +551,15 @@ bool Library::searchForBook(string searchID, string type){
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
-                }
+                }*/
             }else if (type == "ID"){
+                temp = pb->getPubID();
                 //wilcard
+                /**
                 if (wildcardS(pb->getPubID(), searchID)){
                     wildMatch = pb->getPubID();
+                    wildcardFound = true;
+                    found = true;
                     break;
                 }
                 //fuzzy
@@ -556,22 +567,35 @@ bool Library::searchForBook(string searchID, string type){
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
+                }*/
+            }
+            if (!temp.empty()){
+                if (wildcardS(temp, searchID)){
+                    wildMatch = pb->getPubID();
+                    wildcardFound = true;
+                }
+                distan = fuzzySearch(searchID, temp);
+                if (distan <= topDist){
+                    topDist = distan;
+                    bestMatch = pb->getPubID();
                 }
             }
-
-
         }
     }
-
     for (Publication* pbF : readingList){
-        if(pbF->getPubID() == bestMatch){ //print all matches
+        if (!bestMatch.empty() && pbF->getPubID() == bestMatch){ //print all matches
             pbF->viewInfo();
+            found = true;
+            break;
         }
 
-        if (wildcardFound = true && pbF->getPubID() == wildMatch){
+        if (wildcardFound == true && pbF->getPubID() == wildMatch){
             pbF->viewInfo();
+            found = true;
+            break;
         }
     }
+    return found;
 }
 
 int Library::fuzzySearch(string check, string change){

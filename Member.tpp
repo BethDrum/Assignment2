@@ -1,4 +1,3 @@
-#include "Publication.h"
 #include "Member.h"
 
 #include <string>

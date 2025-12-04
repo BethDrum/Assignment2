@@ -1,8 +1,8 @@
 #ifndef MEMBER
 #define MEMBER
 
-#include "Publication.h"
-#include "Member.tpp"
+//#include "Publication.h"
+#include "TempMember.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -36,12 +36,13 @@ class Member{
 
 template <typename T>
 void Member<T>::borrowBook(T pbID){
-    readingList.addPub(bkID);
+    readingList.addPub(pbID);
 }
 
 template <typename T>
 void Member<T>::returnBook(T bkID){
-    readingList.removePub(bkID;);
+    readingList.removePub(bkID);
 }
 
+#include "Member.tpp"
 #endif

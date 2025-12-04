@@ -6,11 +6,12 @@ using namespace std;
 
 template <typename T>
 vector<T> TempMember<T>::getAllBooks(){
-    vector<T> allB;
+    /**vector<T> allB;
     for (T bk : bookList){
         allB.push_back(bk);
     }
-    return allB;
+    return allB;*/
+    return bookList;
 }
 
 //to add a book to the members book list ('Borrow')
@@ -47,4 +48,5 @@ bool TempMember<T>::removePub(T pubID){
         }
         i++;
     }
+    return false;
 }

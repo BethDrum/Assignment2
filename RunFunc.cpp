@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <limits>
 using namespace std;
 
     
@@ -56,9 +57,9 @@ void RunFunc::runSearch(){
     cout << "Please enter if you are searching for: \nT: Title \nA: Author \nG: Genre \nAV: Availiability \nID: Book ID" << endl;
     cin >> typeSearch;
     cout << "Please enter the search term: " << endl;
-    cin >> searchID;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, searchID);
     Lib.searchForBook(searchID, typeSearch);
-    exit(0);
 }
 
 void RunFunc::runDisplayP(){

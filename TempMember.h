@@ -1,7 +1,6 @@
 #ifndef TEMPMEMBER
 #define TEMPMEMBER
 
-#include "TempMember.tpp"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -26,4 +25,5 @@ class TempMember:public Base{
 
 };
 
+#include "TempMember.tpp"
 #endif

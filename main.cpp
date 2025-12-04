@@ -12,8 +12,6 @@ int main(){
     int choice2;
     int choice3;
     bool doneAll = false;
-    bool doneMem = false;
-    bool doneAdm = false;
 
     //menu for testing/running
     while (doneAll == false){
@@ -30,10 +28,12 @@ int main(){
         int extraMInfo = 0;
         string typeSearch = "";
         string searchID = "";
+        bool doneAdm = false;
+        bool doneMem = false;
 
         RunFunc run;
 
-        cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members" << endl;
+        cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members \n3. Done" << endl;
         cin >> choice1;
         //switch for admin or member
         switch(choice1){
@@ -57,7 +57,6 @@ int main(){
                     case 3:
                         cout << "Search for Book selected.\n--------------\n";
                         run.runSearch();
-                        //exit(0);
                         break;
                     case 4:
                         cout << "Display all Books selected.\n--------------\n" << endl;
@@ -83,18 +82,10 @@ int main(){
                         cout << "Save current library selected.\n--------------\n";
                         run.runSaveFile();
                         break;
-                    default:
-                        break;
                     }
                 }
                 break;
             case 2:
-                /**
-                while (!Lib.searchForMemb(mID)){
-                    cout << "Error: The user does not exist. Please enter again" << endl;
-                    cout << "Please enter the ID or name of the member you are:" << endl;
-                    cin >> mID;
-                }*/
                 cout << "You have selected Member options.\n--------------\n";
                 //find the member they are trying to do stuff with and store
                 cout << "Please enter the ID or name of the member you are:" << endl;
@@ -115,14 +106,12 @@ int main(){
                             cout << "Exiting...\n--------------\n";
                             doneMem = true;
                             break;
-                        default:
-                            break;
                     }
                 }
                 break;
             case 0:
                 cout << "Exiting...\n--------------\n";
-                doneAll == true;
+                doneAll = true;
                 break;
             return 0;
         }
