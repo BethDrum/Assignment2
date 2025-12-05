@@ -26,6 +26,7 @@ class Library{
         bool checkPubID(string bkID);
         void addLibJour(string pID, string ti, string au, string gen, int pgC, int vol);
         void addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
+        void addLibEbook(string pID, string ti, string au, string gen, int pgC, int mins);
         void removeLibPub(string pubID);
 
         void dispAllPub(); 

@@ -62,4 +62,15 @@ class Journal : public Publication{
         void viewInfo();
 };
 
+class eBook : public Publication{
+    private:
+        int minToRead;
+    public:
+        int getMins();
+        void setMins(int newMin);
+        eBook(string pID, string ti, string au, string gen, int pgC, int min);
+        eBook(string pID, string ti, string au, string gen, int pgC, int min, int ava);
+        void viewInfo();
+};
+
 #endif

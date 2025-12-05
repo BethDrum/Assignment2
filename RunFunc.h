@@ -30,6 +30,7 @@ class RunFunc{
         string type = "";
         int extraJInfo = 0;
         int extraMInfo = 0;
+        int extraEInfo = 0;
         string typeSearch = "";
         string searchID = "";
 
@@ -48,7 +49,8 @@ class RunFunc{
         void runReadFileGotFile(string bkFile, string mFile);
         void runSaveFile();
         void runSaveFileValues(string bkFile, string mFile);
-        void runBorrow(string bID, string mID);
+        void runBorrow(string mID);
+        void runBorrowKnown(string bID, string mID);
         void runReturn(string bID, string mID);
         void runViewBorrowed(string mID);
         bool checkMemb(string mID);

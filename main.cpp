@@ -90,7 +90,7 @@ int main(){
             case 2:
                 cout << "You have selected Member options.\n--------------\n";
                 //find the member they are trying to do stuff with and store
-                cout << "Please enter the ID or name of the member you are:" << endl;
+                cout << "Please enter the ID of the member you are:" << endl;
                 cin >> mID;
                 checkM = run.checkMemb(mID);
                 if (!checkM){
@@ -102,7 +102,7 @@ int main(){
                     cin >> choice3;
                     switch(choice3){
                         case 1:
-                            run.runBorrow(bID, mID);
+                            run.runBorrow(mID);
                             break;
                         case 2:
                             run.runReturn(bID, mID);
@@ -126,13 +126,13 @@ int main(){
                 cout << "Adding a new memeber Jane..." << endl;
                 run.runAddMemberValue("Jane");
                 cout << "Getting Ben to borrow a Book ID B106..." << endl;
-                run.runBorrow("B106", "M106");
+                run.runBorrowKnown("B106", "M106");
                 cout << "Getting Ben to borrow the same book again..." << endl;
-                run.runBorrow("B106", "M106");
+                run.runBorrowKnown("B106", "M106");
                 cout << "Searching for a book with the title Awaken the Giant Within..." << endl;
                 run.runSearchVal("T", "Awaken the Giant Within");
                 cout << "Getting existing member Chen to borrow book B109..." << endl;
-                run.runBorrow("B109", "M109");
+                run.runBorrowKnown("B109", "M109");
                 cout << "Save created file to new files (members_updated.txt and books_updated.txt)..." << endl;
                 run.runSaveFileValues("members_updated.txt", "books_updated.txt");
                 break;

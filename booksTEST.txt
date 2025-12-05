@@ -1,5 +1,0 @@
-B001 "Hobbit Boppit" "Tolkien" "Fantasy" 310 0 BOOK
-B002 "Dune Boom" "Herbert" "SciFi" 412 1 BOOK
-B003 "Hamlet" "Shakespeare" "Drama" 210 0 BOOK
-B004 "Vogue" "AnnaFashion" "Fashion" 120 1 MAG 45
-B005 "Nature" "Darwin" "Science" 95 0 JOUR 12

@@ -169,3 +169,41 @@ Journal::Journal(string pID, string ti, string au, string gen, int pgC, int vol,
 void Journal::viewInfo(){
     cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Volume: " << volume << " Availiability: " << avai << endl;
 }
+
+//EBOOK
+//constructor for eBooks
+int eBook::getMins(){
+    return minToRead;
+}
+
+void eBook::setMins(int newMin){
+    minToRead = newMin;
+}
+
+//constructor
+eBook::eBook(string pID, string ti, string au, string gen, int pgC, int min){
+    pubID = pID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = 1;
+    minToRead = min;
+    type = "EBOOK";
+}
+
+eBook::eBook(string pID, string ti, string au, string gen, int pgC, int min, int ava){
+    pubID = pID;
+    title = ti;
+    author = au;
+    genre = gen;
+    pgCount = pgC;
+    avai = ava;
+    minToRead = min;
+    type = "EBOOK";
+}
+
+//view info
+void eBook::viewInfo(){
+    cout << "ID: " << pubID << " Title: " << title << " Author: " << author << " Genre: " << genre << " Page Count : " << pgCount << " Minutes taken to read: " << minToRead << " Availiability: " << avai << endl;
+}

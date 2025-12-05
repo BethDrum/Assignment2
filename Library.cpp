@@ -66,6 +66,7 @@ void Library::addLibBook(string pID, string ti, string au, string gen, int pgC){
     }
 }
 
+//to check that the publication ID dosent already exist
 bool Library::checkPubID(string bkID){
     for (Publication* pub : readingList){
         if (pub->getPubID() == bkID){
@@ -93,6 +94,17 @@ void Library::addLibMag(string pID, string ti, string au, string gen, int pgC, i
         readingList.push_back(new Magazine(mag));
     } catch (exception e){
         cout << "Error adding journal" << endl;
+        return;
+    }
+}
+
+//add eBook to the library
+void Library::addLibEbook(string pID, string ti, string au, string gen, int pgC, int mins){
+    eBook eBok(pID, ti, au, gen, pgC, mins);
+    try{
+        readingList.push_back(new eBook(eBok));
+    } catch (exception e){
+        cout << "Error adding eBook" << endl;
         return;
     }
 }
@@ -125,6 +137,9 @@ void Library::dispAllPub(){
         }else if(pb->getType()=="JOUR"){
             Journal* jou = static_cast<Journal*>(pb);
             jou->viewInfo();
+        }else if(pb->getType()=="EBOOK"){
+            eBook* eBok = static_cast<eBook*>(pb);
+            eBok->viewInfo();
         }
     }
 }
@@ -138,6 +153,7 @@ void Library::dispAllMemb(){
     }
 }
 
+//check the member ID dosent already exist
 bool Library::checkMem(string mID){
     for (Member mem : membList){
         if (mem.getMembID() == mID){
@@ -153,8 +169,8 @@ bool Library::borrowPub(string pbID, string memID){
     for (Member<BorrowedBk>& mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
-            //set the book in the library to be unavailiabl
             for (Publication* pb : readingList){
+                //if the publication exists
                 if (pb->getPubID() == pbID){
                     //check if the book is availiable
                     if (pb->getAvai() == 0){
@@ -172,9 +188,9 @@ bool Library::borrowPub(string pbID, string memID){
                         //return false as no book borrowed
                         return false;
                     }
-                    //set to false
+                    //set availiabilty to false
                     pb->setAvail(0);
-                    //add the publication type to the member book list
+                    //get the current date and add that & ID to the booklist for that user
                     time_t date = getDate();
                     BorrowedBk bk{pb->getPubID(), date};
                     if (!mem.readingList.addPub(bk)){
@@ -229,8 +245,10 @@ void Library::returnPub(string pbID, string memID){
     //check for reservation if its been returned
     if (returned == true){
         for (Member<BorrowedBk>& mem : membList){
+            //check if the returned book matches any IDs in members reserved lists
             if (mem.checkRes(pbID)){
                 do{
+                    //notify the user and ask if they want to borrow it or not
                     cout << mem.getMembID() << " (" << mem.getName() << ") " << " The book you reserved - " << pbID << " - is now availiable. \nWould you like to borrow it? Y/N" << endl;
                     cin >> resChoice;
                 }while (resChoice != "Y" && resChoice != "N");
@@ -247,6 +265,7 @@ void Library::returnPub(string pbID, string memID){
     }
 }
 
+//allow viewing of borrowed books
 void Library::viewBorrowed(string mID){
     for (Member mem : membList){
         //if the member exists
@@ -257,24 +276,27 @@ void Library::viewBorrowed(string mID){
     cout << endl;
 }
 
+//function to assist readIn - it splits the data given by spaces unless there is a """
 vector<string> Library::split(string str){
     string token;
     vector<string> tokens;
     stringstream ss(str);
 
     while (ss){
+        //look to see if the next char is a "
         while (isspace(ss.peek())){
             ss.get();
         }
-        //check if there is a quote (for the book title, author etc to not be seperated)
         if (ss.peek() == '"'){
             ss.get();
+            //get the rest of the line until the next " if so 
             getline(ss, token, '"');
         }else{
             if(!(ss >> token)){
                 break;
             };
         }
+        //return the split line
         tokens.push_back(token);
     }
     return tokens;
@@ -303,7 +325,7 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
 
     //open file
     ifstream reader(fileNameBooks);
-
+    //ensure file opened correctly
     if (!reader){
         cout << "Error on opening books file" << endl;
         return false;
@@ -322,6 +344,7 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
         ava = stoi(single[5]);
 
         //for no type
+        //Only 6 charecters so much be a book
         if (single.size() == 6){
             Book book(id, ti, au, gen, pgC, ava);
             try{
@@ -331,13 +354,12 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
                 return false;
             }
         }
-
         //for when type comes im
-        //if only 6 values in this line, its a book so add as that
         if (single.size() == 7){
             type = single[6];
+            //extra info for mag & jour
             int extraInfo = stoi(single[7]);
-
+            //read in depending on given type
             if (type == "BOOK"){
                 Book book(id, ti, au, gen, pgC, ava);
                 try{
@@ -347,7 +369,6 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
                     return false;
                 }
             }else if (type == "MAG"){
-            //else its a journal or magazine, check type and store correspondingly
                 Magazine mag(id, ti, au, gen, pgC, extraInfo, ava);
                 try{
                 readingList.push_back(new Magazine(mag));
@@ -363,14 +384,23 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
                     cout << "Error adding journal" << endl;
                     return false;
                 }
+            }else if (type == "EBOOK"){
+                eBook eBok(id, ti, au, gen, pgC, extraInfo, ava);
+                try{
+                    readingList.push_back(new eBook(eBok));
+                } catch (exception e){
+                    cout << "Error adding eBook" << endl;
+                    return false;
+                }
             }
         }
     }
+    //close first reader
     reader.close();
 
     //for members
     ifstream reader2(fileNameMembers);
-
+    //check second reader opened correctly
     if (!reader2){
         cout << "Error on opening members file" << endl;
         return false;
@@ -404,18 +434,16 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
 }
 
 
-//save library info to file - NEED TO ADD ALL BOOKS FOR THE MEMBER
+//save library info to file
 bool Library::saveToFile(string bkFile, string mFile){
-    //string fileN = filename+".txt";
-    //cout << fileN << endl;
-
     ofstream writerP(bkFile);
-
+    //ensure writer opened correctly
     if (!writerP){
         cerr << "Error opening file for output" << endl;
         return false;
     }
 
+    //for the whole reading list add each publication with all data
     for (Publication* pb : readingList){
         if (pb->getType()=="BOOK"){
             Book* bk = static_cast<Book*>(pb);
@@ -426,16 +454,22 @@ bool Library::saveToFile(string bkFile, string mFile){
         }else if(pb->getType()=="JOUR"){
             Journal* jou = static_cast<Journal*>(pb);
             writerP << jou->getPubID() << " " << '"' << jou->getTitle() << '"' << " " << '"' << jou->getAuthor() << '"' << " " << '"' << jou->getGenre() << '"' << " " << jou->getPgCount() << " " << jou->getAvai()<< "  JOUR" << " " << jou->getVol() << endl;
+        }else if(pb->getType()=="EBOOK"){
+            eBook* eBok = static_cast<eBook*>(pb);
+            writerP << eBok->getPubID() << " " << '"' << eBok->getTitle() << '"' << " " << '"' << eBok->getAuthor() << '"' << " " << '"' << eBok->getGenre() << '"' << " " << eBok->getPgCount() << " " << eBok->getAvai()<< "  EBOOK" << " " << eBok->getMins() << endl;
         }
     }
+    //close first writer
     writerP.close();
 
     ofstream writerM(mFile);
+    //check next writer has opeend correnctly
     if (!writerM){
         cerr << "Error opening file for output" << endl;
         return false;
     }
 
+    //for all of membList write all data held to according file
     for (Member mem : membList){
         writerM << mem.getMembID() << " " << mem.getName() << " ";
         for (auto bk : mem.readingList.getAllBooks()){
@@ -443,18 +477,24 @@ bool Library::saveToFile(string bkFile, string mFile){
         }
         writerM << endl;
     }
+    //close second writer
     writerM.close();
 
     return true;
 }
 
+//to check the penalty according to the data held for each members borrowed books
 double Library::checkPenalty(time_t borDate, string type){
-    time_t currDate;
+    time_t currDate = time(0);
     currDate = getDate();
+    cout << "currDate" <<endl;
     double penalty = 0;
 
     //returns seconds - so all compares must be changed to seconds
     double diff = difftime(currDate, borDate);
+    if (diff <= 0){
+        return 0.0;
+    }
     cout << diff << endl;
 
     //first num in calc is the days
@@ -469,6 +509,10 @@ double Library::checkPenalty(time_t borDate, string type){
     }else if (type == "JOUR" && diff > 12*24*60*60){
         //12 days
         penalty = 20.00;
+        return penalty;
+    }else if (type == "EBOOK" && diff > 13*24*60*60){
+        //12 days
+        penalty = 25.00;
         return penalty;
     }else{
         //no penalty
@@ -500,6 +544,7 @@ time_t Library::getDate(){
     return currentDate;
 }
 
+//to remove any spaces held in a string - used when searching
 string Library::removeSpaces(string str){
     int count = 0;
 
@@ -525,12 +570,14 @@ bool Library::searchForBook(string searchID, string type){
     //remove spaces from searchID
     searchID = removeSpaces(searchID);
     for (Publication* pb : readingList){
+        //direct match search
         if (type ==  "T"){
             if (removeSpaces(pb->getTitle()) == searchID){
                 pb->viewInfo();
                 found = true;
+                return true;
             }
-        }else if (type == "A"){ //needs to print all availiable
+        }else if (type == "A"){ 
             if (removeSpaces(pb->getAuthor()) == searchID){ 
                 pb->viewInfo();
                 found = true;
@@ -555,6 +602,7 @@ bool Library::searchForBook(string searchID, string type){
             if (removeSpaces(pb->getPubID()) == searchID){ //ONLY BE ONE
                 pb->viewInfo();
                 found = true;
+                return true;
             }
         }
 
@@ -611,18 +659,6 @@ bool Library::searchForBook(string searchID, string type){
                     bestMatch = pb->getPubID();
                 }
             }
-            /** 
-            if (!temp.empty()){
-                if (wildcardS(temp, searchID)){
-                    wildMatch = pb->getPubID();
-                    wildcardFound = true;
-                }
-                distan = fuzzySearch(searchID, temp);
-                if (distan <= topDist){
-                    topDist = distan;
-                    bestMatch = pb->getPubID();
-                }
-            }*/
         }
     }
     for (Publication* pbF : readingList){
@@ -655,6 +691,7 @@ int Library::LevenshteinFunc(const string& str1, const string& str2){
     int m = str1.size();
     int n = str2.size();
     
+    //make vector to hold intermediate results of calc
     vector<vector<int>> dp(m+1, vector<int>(n+1));
 
     //for size of m set
@@ -669,7 +706,6 @@ int Library::LevenshteinFunc(const string& str1, const string& str2){
     //naviagte to place m in n
     for (int i = 1; i <= m; i++) {
         for (int j = 1; j <= n; j++) {
-            //
             if (str1[i-1] == str2[j-1]) {
                 dp[i][j] = dp[i-1][j-1];
             } else {
