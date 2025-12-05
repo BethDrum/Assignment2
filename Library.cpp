@@ -66,6 +66,15 @@ void Library::addLibBook(string pID, string ti, string au, string gen, int pgC){
     }
 }
 
+bool Library::checkPubID(string bkID){
+    for (Publication* pub : readingList){
+        if (pub->getPubID() == bkID){
+            return false;
+        }
+    }
+    return true;
+}
+
 //add journal to the library
 void Library::addLibJour(string pID, string ti, string au, string gen, int pgC, int vol){
     Journal jour(pID, ti, au, gen, pgC, vol);
@@ -312,7 +321,6 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
         pgC = stoi(single[4]);
         ava = stoi(single[5]);
 
-        cout << single.size() << endl;
         //for no type
         if (single.size() == 6){
             Book book(id, ti, au, gen, pgC, ava);
@@ -397,11 +405,11 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
 
 
 //save library info to file - NEED TO ADD ALL BOOKS FOR THE MEMBER
-bool Library::saveToFile(){
+bool Library::saveToFile(string bkFile, string mFile){
     //string fileN = filename+".txt";
     //cout << fileN << endl;
 
-    ofstream writerP("booksTEST.txt");
+    ofstream writerP(bkFile);
 
     if (!writerP){
         cerr << "Error opening file for output" << endl;
@@ -422,7 +430,7 @@ bool Library::saveToFile(){
     }
     writerP.close();
 
-    ofstream writerM("membersTEST.txt");
+    ofstream writerM(mFile);
     if (!writerM){
         cerr << "Error opening file for output" << endl;
         return false;
@@ -489,20 +497,18 @@ time_t Library::getDate(){
     date.tm_isdst = -1;
     currentDate = mktime(&date);
 
-    cout << currentDate <<endl;
-
     return currentDate;
 }
 
 string Library::removeSpaces(string str){
     int count = 0;
 
-    for (int i=0; str[i]; i++){
+    for (int i=0; i < str.length(); i++){
         if (str[i] != ' '){
             str[count++] = str[i];
         }
     }
-    str[count] = '\0';
+    str.resize(count);
     return str;
 }
 
@@ -518,12 +524,8 @@ bool Library::searchForBook(string searchID, string type){
 
     //remove spaces from searchID
     searchID = removeSpaces(searchID);
-    cout << searchID << endl;
-    cout << type << endl;
     for (Publication* pb : readingList){
-        cout <<"in pub" << endl;
         if (type ==  "T"){
-            cout << removeSpaces(pb->getTitle()) << endl;
             if (removeSpaces(pb->getTitle()) == searchID){
                 pb->viewInfo();
                 found = true;
@@ -538,7 +540,6 @@ bool Library::searchForBook(string searchID, string type){
                 pb->viewInfo();
                 found = true;
             }
-            cout << "Gen checked" << endl;
         }else if (type == "AV"){
             try{
                 int a = stoi(searchID);
@@ -548,19 +549,17 @@ bool Library::searchForBook(string searchID, string type){
                 }
             }catch (const exception& e){
                 //search term must be a number. if not it will throw a error
-                cerr << "Cannot be av search" << endl;
+                cerr << "Cannot be availiability searched" << endl;
             }
         }else if (type == "ID"){
             if (removeSpaces(pb->getPubID()) == searchID){ //ONLY BE ONE
                 pb->viewInfo();
                 found = true;
             }
-            cout << "ID checked";
         }
 
         if (!found){
             string temp;
-            cout << "in wild/fluffy " << endl;
             //availiability is not included in the fuzzy or wildcard search as it is 1 character and so forth cannot.
             if (type ==  "T"){
                 //wildcard
@@ -587,7 +586,7 @@ bool Library::searchForBook(string searchID, string type){
                     bestMatch = pb->getPubID();
                 }
             }else if (type == "G"){
-                //wildcard
+                //wildcard 
                 if (wildcardS(removeSpaces(pb->getGenre()), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
@@ -612,7 +611,7 @@ bool Library::searchForBook(string searchID, string type){
                     bestMatch = pb->getPubID();
                 }
             }
-
+            /** 
             if (!temp.empty()){
                 if (wildcardS(temp, searchID)){
                     wildMatch = pb->getPubID();
@@ -623,7 +622,7 @@ bool Library::searchForBook(string searchID, string type){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
-            }
+            }*/
         }
     }
     for (Publication* pbF : readingList){
@@ -632,7 +631,6 @@ bool Library::searchForBook(string searchID, string type){
             found = true;
             break;
         }
-
         if (wildcardFound == true && pbF->getPubID() == wildMatch){
             pbF->viewInfo();
             found = true;
@@ -647,13 +645,49 @@ int Library::fuzzySearch(string check, string change){
     string str1 = check;
     string str2 = change;
 
-    int dist = LevenshteinFunc(str1, str2, str1.length(), str2.length());
+    int dist = LevenshteinFunc(str1, str2);
     return dist;
 }
 
 //levenshtein function for fuzzy search - compare simelarity of searched to all names in the list and highest simelarity is shown to user
-int Library::LevenshteinFunc(string str1, string str2, int m, int n){
+int Library::LevenshteinFunc(const string& str1, const string& str2){
+    //set vals to sizes of those read in
+    int m = str1.size();
+    int n = str2.size();
+    
+    vector<vector<int>> dp(m+1, vector<int>(n+1));
+
+    //for size of m set
+    for (int i = 0; i <= m; i++) {
+        dp[i][0] = i;
+    }
+    //for size of n set
+    for (int j = 0; j <= n; j++) {
+        dp[0][j] = j;
+    }
+
+    //naviagte to place m in n
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            //
+            if (str1[i-1] == str2[j-1]) {
+                dp[i][j] = dp[i-1][j-1];
+            } else {
+                dp[i][j] = 1 + min({
+                    //to remove
+                    dp[i-1][j],
+                    //to insert
+                    dp[i][j-1],
+                    //to replace
+                    dp[i-1][j-1] 
+                });
+            }
+        }
+    }
+    return dp[m][n];
+
     //ensure books are not empty
+    /** 
     if (m == 0){
         return n;
     }
@@ -676,6 +710,7 @@ int Library::LevenshteinFunc(string str1, string str2, int m, int n){
                 //replace
                 LevenshteinFunc(str1, str2, m-1,
                                     n-1)));
+    */
 }
 
 //checks if the entered search matches any other values given.

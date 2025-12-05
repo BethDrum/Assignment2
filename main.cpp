@@ -11,6 +11,7 @@ int main(){
     int choice1;
     int choice2;
     int choice3;
+    int choice4;
     bool doneAll = false;
     string bID = "";
     string ti = "";
@@ -32,8 +33,9 @@ int main(){
         bool doneAdm = false;
         bool doneMem = false;
         bool checkM = false;
+        bool doneTest = false;
 
-        cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members \n3. Done" << endl;
+        cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members \n3. Run Tests \n0. Done" << endl;
         cin >> choice1;
         //switch for admin or member
         switch(choice1){
@@ -114,6 +116,25 @@ int main(){
                             break;
                     }
                 }
+                break;
+            case 3:
+                cout << "You have selected Testing. \n--------------\n";
+                cout << "Sample data is being loaded..." << endl;
+                run.runReadFileGotFile("books.txt", "members.txt");
+                cout << "Adding a new book with given values..." << endl;
+                run.runAddPubValues("The Power of Positive Thinking", "Norman Vincent Peale", "Motivational, spiritual", 240);
+                cout << "Adding a new memeber Jane..." << endl;
+                run.runAddMemberValue("Jane");
+                cout << "Getting Ben to borrow a Book ID B106..." << endl;
+                run.runBorrow("B106", "M106");
+                cout << "Getting Ben to borrow the same book again..." << endl;
+                run.runBorrow("B106", "M106");
+                cout << "Searching for a book with the title Awaken the Giant Within..." << endl;
+                run.runSearchVal("T", "Awaken the Giant Within");
+                cout << "Getting existing member Chen to borrow book B109..." << endl;
+                run.runBorrow("B109", "M109");
+                cout << "Save created file to new files (members_updated.txt and books_updated.txt)..." << endl;
+                run.runSaveFileValues("members_updated.txt", "books_updated.txt");
                 break;
             case 0:
                 cout << "Exiting...\n--------------\n";

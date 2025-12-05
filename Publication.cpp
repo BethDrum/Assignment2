@@ -13,6 +13,7 @@ string Publication::getPubID(){
 void Publication::setPubID(string newBookID){
     pubID = newBookID;
 }
+
 //get & set for title
 string Publication::getTitle(){
     return title;

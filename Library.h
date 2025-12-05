@@ -23,6 +23,7 @@ class Library{
         bool searchForMemb(string searchID);
 
         void addLibBook(string pID, string ti, string au, string gen, int pgC);
+        bool checkPubID(string bkID);
         void addLibJour(string pID, string ti, string au, string gen, int pgC, int vol);
         void addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
         void removeLibPub(string pubID);
@@ -37,11 +38,11 @@ class Library{
         vector<string> split(string str);
         bool readFromFile(string fileNameB, string filenameM);
         bool searchForBook(string searchID, string type);
-        bool saveToFile();
+        bool saveToFile(string bkFile, string mFile);
         double checkPenalty(time_t borrDate, string type);
         time_t getDate(); 
         int fuzzySearch(string check, string change);
-        int LevenshteinFunc(string str1, string str2, int m, int n);
+        int LevenshteinFunc(const string& str1, const string& str2);
         bool wildcardS(string searchID, string pattern);
         bool checkMem(string mID);
         string removeSpaces(string str);

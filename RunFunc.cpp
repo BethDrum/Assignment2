@@ -21,19 +21,19 @@ void RunFunc::runAddPub(){
     cout << "Enter Page Count: " << endl;
     cin >> pgC;
 
-    //generate book ID - B then 3 random numbers?
-    srand(static_cast<unsigned>(time(nullptr)));
-    num = rand() % 201;
-    bID = "B"+to_string(num);
-    cout << bID << endl;
-    //get type
-    //cout << "Please enter B for book, M for magazine or J for journal." << endl;
-    //cin >> type;
+    //generate book ID - B then 3 random numbers
+    do{
+        srand(static_cast<unsigned>(time(nullptr)));
+        num = rand() % 201;
+        bID = "B"+to_string(num);
+    //ensure ID dosent exist
+    }while (!Lib.checkPubID(bID));
+
+    //get type and finally add to the library for each one.
     do{
         cout << "Incorrect entered value, \nPlease enter B for book, M for magazine or J for journal." << endl;
         cin >> type;
     }while (type != "B" && type != "M" && type != "J");
-
     if (type == "B"){
         Lib.addLibBook(bID, ti, au, gen, pgC);
     }else if (type == "M"){
@@ -45,6 +45,18 @@ void RunFunc::runAddPub(){
         cin >> extraJInfo;
         Lib.addLibJour(bID, ti, au, gen, pgC, extraJInfo);
     }
+}
+
+void RunFunc::runAddPubValues(string ti, string au, string gen, int pgC){
+    //generate book ID - B then 3 random numbers
+    do{
+        srand(static_cast<unsigned>(time(nullptr)));
+        num = rand() % 201;
+        bID = "B"+to_string(num);
+    //ensure ID dosent exist
+    }while (!Lib.checkPubID(bID));
+    //add to library
+    Lib.addLibBook(bID, ti, au, gen, pgC);
 }
 
 void RunFunc::runRemovePub(){
@@ -59,6 +71,10 @@ void RunFunc::runSearch(){
     cout << "Please enter the search term: " << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, searchID);
+    Lib.searchForBook(searchID, typeSearch);
+}
+
+void RunFunc::runSearchVal(string typeSearch, string searchID){
     Lib.searchForBook(searchID, typeSearch);
 }
 
@@ -86,6 +102,15 @@ void RunFunc::runAddMember(){
     Lib.addMembList(mID, name);//ID and name
 }
 
+void RunFunc::runAddMemberValue(string nam){
+    //generate member ID
+    srand(static_cast<unsigned>(time(nullptr)));
+    num = rand() % 201;
+    mID = "M"+to_string(num);
+
+    Lib.addMembList(mID, nam);
+}
+
 void RunFunc::runRemoveMember(){
     cout << "Enter the ID of the member you wish to delete: " << endl;
     cin >> mID;
@@ -94,17 +119,39 @@ void RunFunc::runRemoveMember(){
     }
 }
 
-void RunFunc::runReadFile(){ //ADD THE USER ENTERING THEIR OWN FILE ---------------------------------------
-    Lib.readFromFile("books.txt", "members.txt");
+void RunFunc::runReadFile(){ 
+    string bkFile = "";
+    string mFile = "";
+    cout << "Enter the book file to read: " << endl;
+    cin >> bkFile;
+    cout << "Enter the member file to read: " << endl;
+    cin >> mFile;
+    Lib.readFromFile(bkFile, mFile);
 }
 
+void RunFunc::runReadFileGotFile(string bkFile, string mFile){ 
+    Lib.readFromFile(bkFile, mFile);
+}
+
+//save to file, asking user for files
 void RunFunc::runSaveFile(){
-    Lib.saveToFile();
+    string bkFile = "";
+    string mFile = "";
+    cout << "Enter the book file to save to: " << endl;
+    cin >> bkFile;
+    cout << "Enter the member file to save to: " << endl;
+    cin >> mFile;
+    Lib.saveToFile(bkFile, mFile);
+}
+
+//save to file with given files
+void RunFunc::runSaveFileValues(string bkFile, string mFile){
+    Lib.saveToFile(bkFile, mFile);
 }
 
 void RunFunc::runBorrow(string bID, string mID){
-    cout << "Enter the ID of the book you wish to borrow: " << endl;
-    cin >> bID;
+    //cout << "Enter the ID of the book you wish to borrow: " << endl;
+    //cin >> bID;
     if (Lib.borrowPub(bID, mID)){
         cout << "The book is now borrowed." << endl;
     }else{

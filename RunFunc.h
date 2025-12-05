@@ -35,14 +35,19 @@ class RunFunc{
 
     public:
         void runAddPub();
+        void runAddPubValues(string ti, string au, string gen, int pgC);
         void runRemovePub();
         void runSearch();
+        void runSearchVal(string typeSearch, string searchID);
         void runDisplayP();
         void runDisplayM();
         void runAddMember();
+        void runAddMemberValue(string nam);
         void runRemoveMember();
         void runReadFile();
+        void runReadFileGotFile(string bkFile, string mFile);
         void runSaveFile();
+        void runSaveFileValues(string bkFile, string mFile);
         void runBorrow(string bID, string mID);
         void runReturn(string bID, string mID);
         void runViewBorrowed(string mID);

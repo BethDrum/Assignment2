@@ -11,9 +11,12 @@
                 "-Wextra",
                 "main.cpp",
                 "Library.cpp",
-                "Member.cpp",
+                "Member.tpp",
+                "TempMember.tpp",
                 "Book.cpp",
+                "Publication.cpp",
                 "RunFunc.cpp"
+
             ],
             "options": {
                 "cwd": "C:/msys64/ucrt64/bin"
