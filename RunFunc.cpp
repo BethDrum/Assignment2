@@ -59,7 +59,6 @@ void RunFunc::runSearch(){
     cout << "Please enter the search term: " << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, searchID);
-    cout << searchID << endl;
     Lib.searchForBook(searchID, typeSearch);
 }
 
@@ -103,22 +102,22 @@ void RunFunc::runSaveFile(){
     Lib.saveToFile();
 }
 
-void RunFunc::runBorrow(){
+void RunFunc::runBorrow(string bID, string mID){
     cout << "Enter the ID of the book you wish to borrow: " << endl;
     cin >> bID;
     if (Lib.borrowPub(bID, mID)){
         cout << "The book is now borrowed." << endl;
     }else{
-        cout << "Error occured: Book not availiable" << endl;
+        cout << "The book cannot be taken out at this time." << endl;
     }
 }
 
-void RunFunc::runReturn(){
+void RunFunc::runReturn(string bID, string mID){
     cout << "Enter the ID of the book you wish to return." << endl;
     cin >> bID;
     Lib.returnPub(bID, mID);
 }
  
-void RunFunc::runViewBorrowed(){
+void RunFunc::runViewBorrowed(string mID){
     Lib.viewBorrowed(mID);
 }

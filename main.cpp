@@ -25,13 +25,13 @@ int main(){
     int extraMInfo = 0;
     string typeSearch = "";
     string searchID = "";
+    RunFunc run;
 
     //menu for testing/running
     while (doneAll == false){
         bool doneAdm = false;
         bool doneMem = false;
-
-        RunFunc run;
+        bool checkM = false;
 
         cout << "Please enter if you wish to access the options for: \n1. Admins \n2. Members \n3. Done" << endl;
         cin >> choice1;
@@ -90,23 +90,23 @@ int main(){
                 //find the member they are trying to do stuff with and store
                 cout << "Please enter the ID or name of the member you are:" << endl;
                 cin >> mID;
+                checkM = run.checkMemb(mID);
+                if (!checkM){
+                    cout << "Member does not exist" << endl;
+                    break;
+                }
                 while (doneMem == false){
-                    bool checkM = run.checkMemb(mID);
-                    if (!checkM){
-                        cout << "Member does not exist" << endl;
-                        break;
-                    }
                     cout << "Enter a number to make your selection: \n1. Borrow a book \n2. Return a book \n3. View all borrowed books" << endl;
                     cin >> choice3;
                     switch(choice3){
                         case 1:
-                            run.runBorrow();
+                            run.runBorrow(bID, mID);
                             break;
                         case 2:
-                            run.runReturn();
+                            run.runReturn(bID, mID);
                             break;
                         case 3:
-                            run.runViewBorrowed();
+                            run.runViewBorrowed(mID);
                             break;
                         case 0:
                             cout << "Exiting...\n--------------\n";

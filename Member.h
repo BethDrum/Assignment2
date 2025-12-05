@@ -17,7 +17,7 @@ class Member{
         vector<string> reserveList;
 
     public:
-        TempMember<T> readingList;
+        TempMember<BorrowedBk> readingList;
         string getMembID();
         void setMembID(string newMemID);
         string getName();

@@ -43,9 +43,9 @@ class RunFunc{
         void runRemoveMember();
         void runReadFile();
         void runSaveFile();
-        void runBorrow();
-        void runReturn();
-        void runViewBorrowed();
+        void runBorrow(string bID, string mID);
+        void runReturn(string bID, string mID);
+        void runViewBorrowed(string mID);
         bool checkMemb(string mID);
 };
 

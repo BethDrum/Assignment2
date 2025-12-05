@@ -14,7 +14,7 @@ using namespace std;
 
 class Library{
     private:
-        vector<Member<string>> membList;
+        vector<Member<BorrowedBk>> membList;
         vector<Publication*> readingList;
 
     public:
@@ -27,7 +27,7 @@ class Library{
         void addLibMag(string pID, string ti, string au, string gen, int pgC, int issueN);
         void removeLibPub(string pubID);
 
-        void dispAllPub(); //ERROR
+        void dispAllPub(); 
         void dispAllMemb();
 
         bool borrowPub(string pbID, string memID);
@@ -39,10 +39,11 @@ class Library{
         bool searchForBook(string searchID, string type);
         bool saveToFile();
         double checkPenalty(time_t borrDate, string type);
-        time_t getDate(); //MATHS AND NEED TO KNOW USEAGE TO FIMISH
+        time_t getDate(); 
         int fuzzySearch(string check, string change);
         int LevenshteinFunc(string str1, string str2, int m, int n);
         bool wildcardS(string searchID, string pattern);
         bool checkMem(string mID);
+        string removeSpaces(string str);
 };
 #endif

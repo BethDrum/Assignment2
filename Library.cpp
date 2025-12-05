@@ -13,7 +13,7 @@ using namespace std;
 
 //to add a member
 void Library::addMembList(string membID, string nam){
-    Member<string> memb(membID, nam);
+    Member<BorrowedBk> memb(membID, nam);
     try{
         membList.push_back(memb);
     }catch (exception e){
@@ -130,11 +130,8 @@ void Library::dispAllMemb(){
 }
 
 bool Library::checkMem(string mID){
-    cout << mID << endl;
     for (Member mem : membList){
-        cout << mem.getMembID() << endl;
         if (mem.getMembID() == mID){
-            cout << "M EXISTS" << endl;
             return true;
         }
     }
@@ -142,12 +139,12 @@ bool Library::checkMem(string mID){
 }
 
 //borrow book
-bool Library::borrowPub(string pbID, string memID){ //INPUT VAL NEEDED
+bool Library::borrowPub(string pbID, string memID){
     string resChoice = "";
-    for (Member<string>& mem : membList){
+    for (Member<BorrowedBk>& mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
-            //set the book in the library to be unavailiable
+            //set the book in the library to be unavailiabl
             for (Publication* pb : readingList){
                 if (pb->getPubID() == pbID){
                     //check if the book is availiable
@@ -156,30 +153,30 @@ bool Library::borrowPub(string pbID, string memID){ //INPUT VAL NEEDED
                         //give option to add to the reserved list
                         do{
                             cout << "Would you like to reserve this book? Y/N" << endl;
-                            cin.clear();
                             cin >> resChoice;
                         }while (resChoice != "Y" && resChoice != "N");
                         
                         if (resChoice == "Y"){
                             mem.addRes(pb->getPubID());
+                            cout << "The book has been added to reservations." << endl;
                         }
+                        //return false as no book borrowed
                         return false;
                     }
                     //set to false
                     pb->setAvail(0);
                     //add the publication type to the member book list
-                    if (!mem.readingList.addPub(pb->getPubID())){
+                    time_t date = getDate();
+                    BorrowedBk bk{pb->getPubID(), date};
+                    if (!mem.readingList.addPub(bk)){
                         cout << "Error when adding publication to member class." << endl;
                         return false;
                     }else{
-                        //get the current date and assign it to the user to track when they borrowed it
-                        time_t date;
-                        date = getDate();
-                        mem.setDateB(date);
                         return true;
                     }
                 }
             }
+            return false;
         }
     }
     return false;
@@ -187,12 +184,11 @@ bool Library::borrowPub(string pbID, string memID){ //INPUT VAL NEEDED
 
 //return book
 void Library::returnPub(string pbID, string memID){
-    int i=0;
     double penalty = 0.0;
     bool returned = false;
     string resChoice = "";
 
-    for (Member mem : membList){
+    for (Member<BorrowedBk>& mem : membList){
         //if the member exists
         if (mem.getMembID() == memID){
             //remove the book from the member book list
@@ -208,43 +204,48 @@ void Library::returnPub(string pbID, string memID){
                         //check if theres a reservation in place for this book
                     }
                     //check for any penalites
-                    penalty = checkPenalty(mem.getDateB(), pb->getType());
-                    if (penalty > 0){
-                        cout << "You have a penalty fee to pay of: " << penalty << endl;
+                    if (pb->getPubID() == pbID){
+                        penalty = checkPenalty(mem.getDateB(), pb->getType());
+                        if (penalty > 0){
+                            cout << "You have a penalty fee to pay of: " << penalty << endl;
+                        }
                     }
                 }
                 returned = true;
+                break;
             }
-            i++;
         }
     }
 
     //check for reservation if its been returned
     if (returned == true){
-        for (Member mem : membList){
+        for (Member<BorrowedBk>& mem : membList){
             if (mem.checkRes(pbID)){
                 do{
                     cout << mem.getMembID() << " (" << mem.getName() << ") " << " The book you reserved - " << pbID << " - is now availiable. \nWould you like to borrow it? Y/N" << endl;
-                    cin.clear();
                     cin >> resChoice;
                 }while (resChoice != "Y" && resChoice != "N");
                 
                 if (resChoice == "Y"){
                     borrowPub(pbID, mem.getMembID());
                 }
+                break;
             }
         }
     }
-    cout << "Memeber not found" << endl;
+    if (!returned){
+        cout << "Memeber not found" << endl;
+    }
 }
 
 void Library::viewBorrowed(string mID){
-    for (Member<string>& mem : membList){
+    for (Member mem : membList){
         //if the member exists
         if (mem.getMembID() == mID){
             mem.readingList.viewBooks();
         }
     }
+    cout << endl;
 }
 
 vector<string> Library::split(string str){
@@ -286,6 +287,8 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
     string mID;
     string mName;
     vector <string> books;
+    time_t date;
+    string bkID;
 
 
 
@@ -309,7 +312,8 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
         pgC = stoi(single[4]);
         ava = stoi(single[5]);
 
-        //if only 6 values in this line, its a book so add as that
+        cout << single.size() << endl;
+        //for no type
         if (single.size() == 6){
             Book book(id, ti, au, gen, pgC, ava);
             try{
@@ -318,11 +322,24 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
                 cout << "Error adding book" << endl;
                 return false;
             }
-        //else its a journal or magazine, check type and store correspondingly
-        }else{
-            int extraInfo = stoi(single[6]);
-            type = single[7];
-            if (type == "MAG"){
+        }
+
+        //for when type comes im
+        //if only 6 values in this line, its a book so add as that
+        if (single.size() == 7){
+            type = single[6];
+            int extraInfo = stoi(single[7]);
+
+            if (type == "BOOK"){
+                Book book(id, ti, au, gen, pgC, ava);
+                try{
+                    readingList.push_back(new Book(book));
+                } catch (exception e){
+                    cout << "Error adding book" << endl;
+                    return false;
+                }
+            }else if (type == "MAG"){
+            //else its a journal or magazine, check type and store correspondingly
                 Magazine mag(id, ti, au, gen, pgC, extraInfo, ava);
                 try{
                 readingList.push_back(new Magazine(mag));
@@ -330,7 +347,7 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
                     cout << "Error adding journal" << endl;
                     return false;
                 }
-            }if (type == "JOUR"){
+            }else if (type == "JOUR"){
                 Journal jour(id, ti, au, gen, pgC, extraInfo, ava);
                 try{
                     readingList.push_back(new Journal(jour));
@@ -355,24 +372,23 @@ bool Library::readFromFile(string fileNameBooks, string fileNameMembers){
     while(getline(reader2, mLines)){
         //split by the spaces
         vector<string> mSingle = split(mLines);
+
         //assign spaces to their acccording things
         mID = mSingle[0];
         mName = mSingle[1];
-        Member<string> memb(mID, mName);
+        Member<BorrowedBk> memb(mID, mName);
         //book list
-        for (int i = 2; i < mSingle.size(); i++){
-            if (!memb.readingList.addPub(mSingle[i])){
-                cout << "Error when adding publication to member class." << endl;
+        //so it does book then date every other one
+        for (int i = 2; i + 1 < mSingle.size(); i+=2){
+            bkID = mSingle[i];
+            date = static_cast<time_t>(stoi(mSingle[i+1]));
+            BorrowedBk bk{bkID, date};
+            if (!memb.readingList.addPub(bk)){
+                cout << "Error when adding publications to member class." << endl;
                 return false;
             }
         }
-        try{
-            membList.push_back(memb);
-        }catch (exception e){
-            cout << "Error adding to vector" << endl;
-            return false;
-        }
-
+        membList.push_back(memb);
     }
     //close reader and return
     reader2.close();
@@ -395,13 +411,13 @@ bool Library::saveToFile(){
     for (Publication* pb : readingList){
         if (pb->getType()=="BOOK"){
             Book* bk = static_cast<Book*>(pb);
-            writerP << pb->getPubID() << " " << '"' << pb->getTitle() << '"' << " " << '"' << pb->getAuthor() << '"' << " " << '"' << pb->getGenre() << '"' << " " << pb->getPgCount() << " " << pb->getAvai() << endl;
+            writerP << pb->getPubID() << " " << '"' << pb->getTitle() << '"' << " " << '"' << pb->getAuthor() << '"' << " " << '"' << pb->getGenre() << '"' << " " << pb->getPgCount() << " " << pb->getAvai() << "  BOOK" << endl;
         }else if(pb->getType()=="MAG"){
             Magazine* mg = static_cast<Magazine*>(pb);
-            writerP << mg->getPubID() << " " << '"' << mg->getTitle() << '"' << " " << '"' << mg->getAuthor() << '"' << " " << '"' << mg->getGenre() << '"' << " " << mg->getPgCount() << " " << mg->getAvai() << " " << mg->getIssueN() << endl;
+            writerP << mg->getPubID() << " " << '"' << mg->getTitle() << '"' << " " << '"' << mg->getAuthor() << '"' << " " << '"' << mg->getGenre() << '"' << " " << mg->getPgCount() << " " << mg->getAvai() << "  MAG" << " " << mg->getIssueN() << endl;
         }else if(pb->getType()=="JOUR"){
             Journal* jou = static_cast<Journal*>(pb);
-            writerP << jou->getPubID() << " " << '"' << jou->getTitle() << '"' << " " << '"' << jou->getAuthor() << '"' << " " << '"' << jou->getGenre() << '"' << " " << jou->getPgCount() << " " << jou->getAvai() << " " << jou->getVol() << endl;
+            writerP << jou->getPubID() << " " << '"' << jou->getTitle() << '"' << " " << '"' << jou->getAuthor() << '"' << " " << '"' << jou->getGenre() << '"' << " " << jou->getPgCount() << " " << jou->getAvai()<< "  JOUR" << " " << jou->getVol() << endl;
         }
     }
     writerP.close();
@@ -413,11 +429,9 @@ bool Library::saveToFile(){
     }
 
     for (Member mem : membList){
-        vector<string> allBooks;
-        allBooks = mem.readingList.getAllBooks();
         writerM << mem.getMembID() << " " << mem.getName() << " ";
-        for (int i=0; i< allBooks.size(); i++){
-            writerM << allBooks[i] << " ";
+        for (auto bk : mem.readingList.getAllBooks()){
+            writerM << bk.bookID << " " << bk.date << " ";
         }
         writerM << endl;
     }
@@ -432,19 +446,20 @@ double Library::checkPenalty(time_t borDate, string type){
     double penalty = 0;
 
     //returns seconds - so all compares must be changed to seconds
-    double diff = difftime(borDate, currDate);
+    double diff = difftime(currDate, borDate);
     cout << diff << endl;
 
+    //first num in calc is the days
     if (type == "BOOK" && diff > 10*24*60*60){
         //10 days for books
         penalty = 10.00;
         return penalty;
-    }else if (type == "MAG" && diff > 15*24*60*60){
-        //15 days
+    }else if (type == "MAG" && diff > 11*24*60*60){
+        //11 days
         penalty = 15.00;
         return penalty;
-    }else if (type == "MAG" && diff > 20*24*60*60){
-        //20 days
+    }else if (type == "JOUR" && diff > 12*24*60*60){
+        //12 days
         penalty = 20.00;
         return penalty;
     }else{
@@ -453,15 +468,11 @@ double Library::checkPenalty(time_t borDate, string type){
     }
 }
 
-//JUST NEEDS MATH - should track due date then calc penalties - can be different for type
+//to get the current date
 time_t Library::getDate(){
     //get day
     time_t currentDate = time(0);
     tm *currDate = localtime(&currentDate);
-
-    cout << "Year: " << 1900+currDate->tm_year << endl;
-    cout << "Month" << 1+currDate->tm_mon << endl;
-    cout << "Day:" << currDate->tm_mday << endl;
 
     int yr = 1900+currDate->tm_year;
     int mon = 1+currDate->tm_mon;
@@ -469,20 +480,31 @@ time_t Library::getDate(){
 
     //put into comparable format
     struct tm date;
-    date.tm_year = yr;
+    date.tm_year = yr - 1900;
     date.tm_mday = day;
-    date.tm_mon = mon;
+    date.tm_mon = mon - 1;
+    date.tm_hour = 0;
+    date.tm_min  = 0;
+    date.tm_sec  = 0;
+    date.tm_isdst = -1;
     currentDate = mktime(&date);
+
+    cout << currentDate <<endl;
 
     return currentDate;
 }
 
-/**
-auto checkString = [](string s){
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){return std::tolower(c);});
-    s.erase(s.find_last_not_of("\n\r\t")+1);
-    return s;
-};*/
+string Library::removeSpaces(string str){
+    int count = 0;
+
+    for (int i=0; str[i]; i++){
+        if (str[i] != ' '){
+            str[count++] = str[i];
+        }
+    }
+    str[count] = '\0';
+    return str;
+}
 
 //search for book
 bool Library::searchForBook(string searchID, string type){
@@ -494,27 +516,25 @@ bool Library::searchForBook(string searchID, string type){
     bool wildcardFound = false;
     string wildMatch = "";
 
-    cout << "in search function" << endl;
+    //remove spaces from searchID
+    searchID = removeSpaces(searchID);
+    cout << searchID << endl;
+    cout << type << endl;
     for (Publication* pb : readingList){
-        if (!pb){
-            cout << "Null pointer in readingList"<< endl;
-            continue;
-        }
-        cout << "loop:" << pb->getPubID() << endl;
-        //cout << "in loop checks" << pb->getTitle() << " with " << searchID << endl;
+        cout <<"in pub" << endl;
         if (type ==  "T"){
-            if (pb->getTitle() == searchID){
-                pb->viewInfo(); //ONLY BE ONE
+            cout << removeSpaces(pb->getTitle()) << endl;
+            if (removeSpaces(pb->getTitle()) == searchID){
+                pb->viewInfo();
                 found = true;
-                return found;
             }
         }else if (type == "A"){ //needs to print all availiable
-            if (pb->getAuthor() == searchID){ 
+            if (removeSpaces(pb->getAuthor()) == searchID){ 
                 pb->viewInfo();
                 found = true;
             }
         }else if (type == "G"){
-            if (pb->getGenre() == searchID){ 
+            if (removeSpaces(pb->getGenre()) == searchID){ 
                 pb->viewInfo();
                 found = true;
             }
@@ -531,49 +551,49 @@ bool Library::searchForBook(string searchID, string type){
                 cerr << "Cannot be av search" << endl;
             }
         }else if (type == "ID"){
-            if (pb->getPubID() == searchID){ //ONLY BE ONE
+            if (removeSpaces(pb->getPubID()) == searchID){ //ONLY BE ONE
                 pb->viewInfo();
                 found = true;
-                return found;
             }
             cout << "ID checked";
         }
 
         if (!found){
             string temp;
+            cout << "in wild/fluffy " << endl;
             //availiability is not included in the fuzzy or wildcard search as it is 1 character and so forth cannot.
             if (type ==  "T"){
                 //wildcard
-                if (wildcardS(pb->getTitle(), searchID)){
+                if (wildcardS(removeSpaces(pb->getTitle()), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
                 }
                 //fuzzy
-                distan = fuzzySearch(searchID, pb->getTitle());
+                distan = fuzzySearch(searchID, removeSpaces(pb->getTitle()));
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
             }else if (type == "A"){
                 //wildcard
-                if (wildcardS(pb->getAuthor(), searchID)){
+                if (wildcardS(removeSpaces(pb->getAuthor()), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
                 }
                 //fuzzy
-                distan = fuzzySearch(searchID, pb->getAuthor());
+                distan = fuzzySearch(searchID, removeSpaces(pb->getAuthor()));
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
                 }
             }else if (type == "G"){
                 //wildcard
-                if (wildcardS(pb->getGenre(), searchID)){
+                if (wildcardS(removeSpaces(pb->getGenre()), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
                 }
                 //fuzzy
-                distan = fuzzySearch(searchID, pb->getGenre());
+                distan = fuzzySearch(searchID, removeSpaces(pb->getGenre()));
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
@@ -581,12 +601,12 @@ bool Library::searchForBook(string searchID, string type){
             }else if (type == "ID"){
                 temp = pb->getPubID();
                 //wildcard
-                if (wildcardS(pb->getPubID(), searchID)){
+                if (wildcardS(removeSpaces(pb->getPubID()), searchID)){
                     wildMatch = pb->getPubID();
                     wildcardFound = true;
                 }
                 //fuzzy
-                distan = fuzzySearch(searchID, pb->getPubID());
+                distan = fuzzySearch(searchID, removeSpaces(pb->getPubID()));
                 if (distan <= topDist){
                     topDist = distan;
                     bestMatch = pb->getPubID();
